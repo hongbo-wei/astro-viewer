@@ -1,0 +1,52 @@
+{
+  "name": "@zj-astro/operators",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    "./operator-detail": "./src/Detail/index.tsx",
+    "./operator-list": "./src/List/index.tsx"
+  },
+  "scripts": {
+    "check": "tsc --noEmit",
+    "lint": "eslint . --ext ts,tsx,.js,.jsx --report-unused-disable-directives --max-warnings 0",
+    "preinstall": "npx -y only-allow pnpm"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^5.3.6",
+    "@ant-design/plots": "^2.1.15",
+    "@antv/g6": "^4.8.24",
+    "@zj-astro/ui": "workspace:*",
+    "ahooks": "^3.8.0",
+    "antd": "^5.15.1",
+    "axios": "^1.6.7",
+    "clsx": "^2.1.0",
+    "dayjs": "^1.11.10",
+    "dotenv": "^16.4.5",
+    "elkjs": "^0.9.3",
+    "i18next": "^23.10.1",
+    "i18next-browser-languagedetector": "^7.2.0",
+    "lodash-es": "^4.17.21",
+    "qs": "^6.12.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-i18next": "^14.1.0",
+    "react-router-dom": "6",
+    "react-virtualized-auto-sizer": "^1.0.24",
+    "react-window": "^1.8.10",
+    "sass": "^1.72.0",
+    "zustand": "^4.5.2"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "*",
+    "@repo/typescript-config": "*",
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "@typescript-eslint/eslint-plugin": "^7.2.0",
+    "@typescript-eslint/parser": "^7.2.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.6",
+    "typescript": "^5.2.2"
+  }
+}

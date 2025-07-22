@@ -1,0 +1,21 @@
+:root.light {
+  --bg: #f1f2f5;
+  --datas-bg: #f1f2f5;
+  --card-bg: #fff;
+  --title: rgba(0, 0, 0, 0.45);
+  --list-name: rgba(0, 0, 0, 0.85);
+  --table-header: #fff;
+  --header-line: #f0f0f0;
+  --table-body: #fff;
+}
+
+:root.dark {
+  --bg: #0a0a0a;
+  --card-bg: #141414;
+  --datas-bg: #141414;
+  --title: rgba(255, 255, 255, 0.45);
+  --list-name: rgba(255, 255, 255, 0.85);
+  --table-header: #2f2f2f;
+  --header-line: rgba(255, 255, 255, 0.12);
+  --table-body: #1d1d1d;
+}

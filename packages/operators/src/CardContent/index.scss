@@ -1,0 +1,35 @@
+.astro-operator-card-content {
+  overflow: hidden;
+
+  &-title {
+    font-size: 24px;
+    font-weight: 500;
+    color: var(--color-title);
+    margin-bottom: 4px;
+    line-height: 32px;
+  }
+
+  &-author {
+    font-size: 14px;
+    color: var(--color-title);
+    margin-bottom: 20px;
+    line-height: 22px;
+    font-weight: 400;
+  }
+
+  &-tagList {
+    display: flex;
+    flex-wrap: nowrap;
+    margin-right: 8px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+
+  &-text {
+    font-size: 12px;
+    color: var(--color-desc);
+    line-height: 20px;
+    font-weight: 400;
+    text-align: justify;
+  }
+}

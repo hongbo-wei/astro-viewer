@@ -1,0 +1,14 @@
+export const primary1 = '#E6F9FF'
+export const primary2 = '#7AD7FF'
+export const primary3 = '#A3E7FF' // border
+export const black85 = 'rgba(0, 0, 0, 0.85)'
+export const black4 = '#BFBFBF'
+export const danger1 = 'rgba(255, 163, 158, 1)'
+export const danger2 = 'rgba(255, 242, 232, 1)'
+export const danger3 = '#FFCCC7' // border
+export const success1 = '#B7EB8F'
+export const success2 = '#F6FFED'
+export const success3 = '#D9F7BE' // border
+export const grey1 = '#D9D9D9' // border
+export const white1 = '#fff' // fill
+export const grey2 = '#F0F0F0' // 光晕

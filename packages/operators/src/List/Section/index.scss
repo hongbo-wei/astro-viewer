@@ -1,0 +1,22 @@
+.astro-operator-list-section {
+  background: var(--bg-color-section);
+  padding: 24px;
+  margin-bottom: 24px;
+  border-radius: 8px;
+
+  .ant-row {
+    margin-bottom: 24px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &-cardWrap {
+    position: relative;
+  }
+
+  &-card {
+    border-radius: 8px;
+  }
+}

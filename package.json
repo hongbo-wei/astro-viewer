@@ -1,0 +1,41 @@
+{
+  "name": "astro-fe",
+  "private": true,
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "lint": "turbo lint",
+    "check": "turbo check",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "preinstall": "npx -y only-allow pnpm",
+    "prepare": "husky install",
+    "pre-commit-hook": "turbo check && lint-staged"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "prettier": "^3.2.5",
+    "turbo": "latest",
+    "husky": "8.0.3",
+    "lint-staged": "^15.2.2",
+    "stylelint": "^16.6.1",
+    "stylelint-config-standard-scss": "^13.1.0",
+    "stylelint-scss": "^6.3.1",
+    "@commitlint/cli": "^19.0.3",
+    "@commitlint/config-conventional": "^19.0.3"
+  },
+  "lint-staged": {
+    "{apps,packages}/**/src/**/*.{js,jsx,ts,tsx}": [
+      "eslint --max-warnings 0",
+      "prettier --write"
+    ],
+    "{apps,packages}/**/src/**/*.scss": [
+      "stylelint --fix",
+      "prettier --write"
+    ]
+  },
+  "packageManager": "pnpm@8.9.0",
+  "engines": {
+    "node": ">=18"
+  }
+}

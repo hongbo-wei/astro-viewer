@@ -1,0 +1,77 @@
+.wrap {
+  background: $white;
+  padding: 13px 16px;
+  align-items: flex-end;
+  border-radius: 4px;
+  border: 1px solid $grey4;
+
+  &.active,
+  &:hover {
+    border: 1px solid $primary-6;
+  }
+
+  .send {
+    fill: $black25;
+
+    &.active {
+      fill: $primary-6;
+      fill-opacity: 1;
+    }
+  }
+}
+
+.textarea {
+  // width: 100%;
+  flex: 1;
+  height: 472px;
+  max-height: 25dvh;
+  resize: none;
+  border: none;
+  min-height: 22px !important;
+  font-size: 14px;
+  line-height: 22px;
+  padding: 0;
+  margin: 3px 0;
+  border-radius: 0;
+}
+
+.send {
+  width: 28px;
+  height: 28px;
+  margin-left: 20px;
+  fill: $black;
+  fill-opacity: 0.25;
+  transition: all 0.1s ease-in-out;
+  cursor: pointer;
+}
+
+// upload
+
+.wrap .btnUpload {
+  width: 28px;
+  height: 28px;
+  margin-bottom: 2px;
+}
+
+.btnWrap {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+
+  .academicSearch {
+    font-size: 12px;
+    border-radius: 4px;
+    background-color: $grey6;
+    height: 26px;
+    line-height: 26px;
+    border: 1px solid $grey4;
+    padding: 0 7px;
+    cursor: pointer;
+
+    &.active {
+      border: 1px solid $blue6;
+      background-color: $primary-1;
+      color: $blue6;
+    }
+  }
+}

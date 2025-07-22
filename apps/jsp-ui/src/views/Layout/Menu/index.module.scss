@@ -1,0 +1,14 @@
+.menu {
+  background: var(--bg);
+  height: 100%;
+  padding-left: 8px;
+  flex: 1;
+}
+
+:global {
+  .ant-menu-item:not(.ant-menu-item-selected) {
+    .ant-menu-title-content {
+      color: $grey2 !important;
+    }
+  }
+}

@@ -1,0 +1,13 @@
+.labelvalue {
+  display: flex;
+
+  .key {
+    margin-right: 8px;
+    white-space: nowrap;
+  }
+
+  .value {
+    flex: 1;
+    overflow: hidden;
+  }
+}

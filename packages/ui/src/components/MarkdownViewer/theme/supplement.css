@@ -1,0 +1,66 @@
+/* 补充github-markdown没有的样式, 不允许修改本文件样式！！！！！
+ 请在引用组件的地方修改样式 */
+.astro-markdown {
+  font-size: 14px;
+  ol,
+  ul,
+  menu {
+    list-style: initial;
+  }
+
+  .code-block-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: transparent;
+    margin-bottom: 5px;
+    /* // 之前AI助手用的下面这个 */
+    /* // background: #f6f8fa; */
+    padding: 4px 8px;
+    font-size: 0.875rem;
+    /* // 之前AI助手用的下面这个
+    // border-bottom: 1px solid #ddd; */
+  }
+
+  .code-block-header__lang {
+    font-weight: bold;
+  }
+  .code-block-wrapper pre {
+    background-color: transparent !important;
+    margin-bottom: 0;
+    font-size: 1em;
+    padding: 0;
+  }
+
+  .code-block-header__copy {
+    cursor: pointer;
+  }
+
+  /* // Mermaid */
+  div[id^='mermaid-container'] {
+    padding: 4px;
+    border-radius: 4px;
+    overflow-x: auto !important;
+    background-color: #fff;
+    border: 1px solid #e5e5e5;
+    text-align: center;
+  }
+}
+.markdown-body[data-theme='dark'] {
+  .code-block-header__copy,
+  .code-block-header__lang {
+    color: #0366d6;
+  }
+  .code-block-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
+.markdown-body[data-theme='light'] {
+  .code-block-header__copy,
+  .code-block-header__lang {
+    color: #6d6d6d;
+  }
+  .code-block-header {
+    border-bottom: 1px solid #e5e5e5;
+  }
+}

@@ -1,0 +1,19 @@
+@import '@zj-astro/ui/var.scss';
+
+.astro-operator-card {
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  height: 222px;
+  cursor: pointer;
+  z-index: 48;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+  }
+
+  .ant-card-body {
+    padding: 24px;
+  }
+}

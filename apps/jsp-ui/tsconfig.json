@@ -1,0 +1,17 @@
+{
+  "extends": "@repo/typescript-config/react-vite.json",
+  "compilerOptions": {
+    /* Bundler mode */
+
+    /* Linting */
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src"],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
+}

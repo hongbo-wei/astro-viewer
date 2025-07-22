@@ -1,0 +1,74 @@
+.astro-operator-detail {
+  .ant-breadcrumb {
+    height: 24px;
+    line-height: 24px;
+  }
+
+  .ant-breadcrumb-link {
+    // 详情
+    color: var(--color-link) !important;
+  }
+
+  svg,
+  .ant-breadcrumb-separator,
+  .ant-breadcrumb-link {
+    a,
+    .anticon {
+      // 返回按钮
+      color: var(--color-back) !important;
+    }
+  }
+
+  .ant-breadcrumb-separator {
+    color: var(--color-back) !important;
+  }
+
+  &-divider {
+    padding: 0 24px;
+  }
+
+  .ant-divider {
+    border-color: var(--ant-divider-color);
+    margin: 0;
+  }
+
+  .ant-btn-primary {
+    background-color: #0098ff !important;
+  }
+
+  .mdWrapper {
+    .markdown-body[data-theme='dark'] {
+      // markdown 整体背景色
+      /* stylelint-disable-next-line */
+      --bgColor-default: var(--bg-color-detail);
+      /* stylelint-disable-next-line */
+      --bgColor-muted: rgba(255, 255, 255, 0.05); // 代码块
+    }
+  }
+
+  &-topSection {
+    background: var(--bg-color-detail-top);
+    margin-bottom: 24px;
+  }
+
+  &-backWrap {
+    padding: 24px;
+  }
+
+  &-cardWrap {
+    padding: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+  }
+
+  &-btn {
+    margin-left: 24px;
+  }
+
+  &-mdWrap {
+    border-radius: 8px;
+    padding: 24px;
+    background-color: var(--bg-color-detail);
+  }
+}

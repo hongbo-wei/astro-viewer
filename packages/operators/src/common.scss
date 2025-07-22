@@ -1,0 +1,94 @@
+@import '@zj-astro/ui/var.scss';
+
+.astro-operator-common {
+  &-wrapper {
+    background-color: var(--bg-color-operators);
+  }
+
+  &-dark {
+    --bg-color-section: #0e1722;
+    --bg-color-operators: #000;
+    --bg-color-detail: #0e1722;
+    --bg-color-detail-top: #0e1722;
+    --color-back: #a6a6a6;
+    --color-link: #fff;
+    --card-title: #fff;
+    --card-desc: rgba(255, 255, 255, 0.85);
+    --ant-divider-color: rgba(255, 255, 255, 0.3);
+  }
+
+  &-light {
+    --bg-color-section: #fff;
+    --bg-color-operators: $grey1;
+    --bg-color-detail: #fff;
+    --bg-color-detail-top: #f0f5ff;
+    --color-back: $black45;
+    --color-link: $black45;
+    --card-title: $black85;
+    --card-desc: $black85;
+    --ant-divider-color: #d9d9d9;
+  }
+
+  &-blueTag {
+    .ant-card-bordered {
+      border: none;
+    }
+
+    .ant-card {
+      background: #f0f5ff;
+      border-bottom: 4px solid #2f54eb;
+    }
+
+    .ant-tag {
+      color: #2f54eb;
+      border: 1px solid #adc6ff;
+      background: #d6e4ff;
+    }
+
+    .ant-divider {
+      background-color: #2f54eb !important;
+    }
+  }
+
+  &-cyanTag {
+    .ant-card-bordered {
+      border: none;
+    }
+
+    .ant-card {
+      background: #e6fffb;
+      border-bottom: 4px solid #08979c;
+    }
+
+    .ant-tag {
+      color: #08979c;
+      border: 1px solid #87e8de;
+      background: #b5f5ec;
+    }
+
+    .ant-divider {
+      background-color: #08979c !important;
+    }
+  }
+
+  &-purpleTag {
+    .ant-card-bordered {
+      border: none;
+    }
+
+    .ant-card {
+      background: #f9f0ff;
+      border-bottom: 4px solid #722ed1;
+    }
+
+    .ant-tag {
+      color: #722ed1;
+      border: 1px solid #d3adf7;
+      background: #efdbff;
+    }
+
+    .ant-divider {
+      background-color: #722ed1 !important;
+    }
+  }
+}

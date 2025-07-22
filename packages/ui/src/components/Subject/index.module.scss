@@ -1,0 +1,19 @@
+@import '../../style/var.scss';
+
+.wrap {
+  line-height: 22px;
+
+  .title {
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+
+    .divider {
+      background: $brand6;
+      width: 4px;
+      margin-inline: 0;
+      margin-right: 8px;
+    }
+  }
+}

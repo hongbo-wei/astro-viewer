@@ -1,0 +1,17 @@
+@import '../../style/var.scss';
+
+.breadcrumb {
+  :global {
+    .ant-breadcrumb {
+      margin: auto 0 !important;
+    }
+  }
+
+  color: $black65;
+  height: 70px;
+  line-height: 70px;
+}
+
+.back {
+  line-height: 1.5em;
+}

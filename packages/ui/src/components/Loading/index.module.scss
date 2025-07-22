@@ -1,0 +1,13 @@
+.loading {
+  text-align: center;
+  margin-block: 32px;
+
+  div {
+    color: $black25;
+  }
+
+  & > div:last-child {
+    line-height: 22px;
+    margin-top: 8px;
+  }
+}

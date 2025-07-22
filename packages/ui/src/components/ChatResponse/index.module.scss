@@ -1,0 +1,44 @@
+.response {
+  display: flex;
+  padding-right: 48px;
+  align-items: flex-start;
+
+  &.showTime {
+    .avatar {
+      padding-top: 17px;
+    }
+  }
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  overflow: hidden;
+}
+
+.time {
+  font-size: 12px;
+  color: $black25;
+}
+
+.text {
+  border-radius: 4px;
+  background: $white;
+  color: $black85;
+  padding: 16px;
+  min-height: 56px;
+  width: 100%;
+}
+
+.avatar {
+  width: 40px;
+  height: 54px;
+  padding-top: 7px;
+  line-height: 54px;
+  margin-right: 8px;
+
+  img {
+    width: 40px;
+  }
+}

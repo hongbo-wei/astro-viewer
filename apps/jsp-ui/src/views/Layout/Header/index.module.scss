@@ -1,0 +1,40 @@
+.header {
+  position: sticky;
+  display: flex;
+  width: 100%;
+  z-index: 1;
+  color: $white85;
+  user-select: none;
+
+  .titleWrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-right: 30px;
+
+    .title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .logo svg {
+      width: 32px;
+      height: 32px;
+    }
+  }
+
+  .langBtn {
+    font-size: 16px;
+    display: none;
+  }
+}
+
+:global {
+  .ant-layout-header {
+    padding-left: 16px;
+    padding-right: 24px;
+    background-color: $black;
+    height: 48px;
+    line-height: 48px;
+  }
+}

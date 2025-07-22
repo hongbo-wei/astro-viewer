@@ -1,0 +1,41 @@
+.ai {
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.new {
+  position: absolute;
+  top: 28px;
+  left: 0;
+}
+
+.main {
+  height: 100%;
+
+  // width: 800px;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  overflow: auto;
+  flex: 1 1 0%;
+  padding: 16px 0;
+}
+
+.wrap {
+  width: 800px;
+  margin: 0 auto;
+}
+
+.input {
+  width: 800px;
+  margin: 0 auto;
+  padding-bottom: 32px;
+}
+
+.line {
+  margin: 16px 0;
+}

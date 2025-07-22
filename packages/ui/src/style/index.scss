@@ -1,0 +1,41 @@
+@import './base.scss';
+@import './mixin.scss';
+@import './var.scss';
+
+// 覆盖antd样式
+// .ant-layout-content
+//   background: $grey1
+.ant-layout,
+.ant-layout-content {
+  background: $grey1;
+}
+
+.ant-collapse-content,
+.ant-table-content,
+.ant-table-body {
+  scrollbar-width: auto;
+  scrollbar-color: auto;
+
+  @include scrollbar;
+}
+
+.status-circle {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
+
+  &.success {
+    background: $success;
+  }
+
+  &.running {
+    background: $blue1;
+  }
+
+  &.failure {
+    background: $danger;
+  }
+}

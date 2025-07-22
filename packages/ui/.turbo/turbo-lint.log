@@ -1,0 +1,5 @@
+
+
+> @zj-astro/ui@0.0.0 lint /Users/hongbo_wei/Downloads/GitHub/astronomical_projects/joint-survey-processing/astro-fe/packages/ui
+> eslint . --max-warnings 0 "--fix"
+

@@ -1,0 +1,22 @@
+@mixin block-wrap {
+  background: $white;
+  padding: 16px 24px;
+}
+
+@mixin scrollbar {
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+    background-color: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: $grey4;
+    border-radius: 3px;
+    border: 3px solid transparent;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+}

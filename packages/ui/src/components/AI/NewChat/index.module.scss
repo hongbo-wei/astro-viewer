@@ -1,0 +1,36 @@
+.new {
+  border-radius: 0 30px 30px 0;
+  background: $white;
+  color: $black85;
+  transition: all 0.3s ease;
+  height: 60px;
+  cursor: pointer;
+  padding: 18px 20px;
+  width: 68px;
+  overflow: hidden;
+  font-size: 14px;
+
+  &:hover {
+    width: 146px;
+
+    .text {
+      visibility: visible;
+    }
+  }
+}
+
+.icon {
+  font-size: 24px;
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  width: 120px;
+}
+
+.text {
+  display: inline-block;
+  visibility: hidden;
+  margin-left: 8px;
+}

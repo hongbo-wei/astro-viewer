@@ -1,0 +1,20 @@
+const PIE_COLOR_ONE = ['#13C2C2', '#52C41A', '#FAAD14']
+
+const PIE_COLOR_TWO = ['#0098FF', '#13C2C2', '#52C41A', '#FAAD14', '#FF4D4F']
+
+const AREA_COLOR_ONE = ['#52C41A', '#FAAD14', '#13C2C2']
+
+const CHART_COLOR = [
+  '#4689F7',
+  '#26A7FF',
+  '#36CBCB',
+  '#6CCD3C',
+  '#CC8DF8',
+  '#7C6FF7',
+  '#FF6869',
+  '#FF9C6E',
+  '#FBB937',
+  '#FFF566',
+]
+
+export { PIE_COLOR_ONE, PIE_COLOR_TWO, AREA_COLOR_ONE, CHART_COLOR }
