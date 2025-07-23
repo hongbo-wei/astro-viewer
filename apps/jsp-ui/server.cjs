@@ -10,7 +10,10 @@ app.use(cors())
 app.use(bodyParser.json())
 
 app.post('/api/log', (req, res) => {
-  console.log('前端传来的数据:', JSON.stringify(req.body, null, 2))
+  console.log('--- Telescopes & Filters ---')
+  console.log(JSON.stringify(req.body.telescopesAndFilters ?? [], null, 2))
+  console.log('--- Coordinations ---')
+  console.log(JSON.stringify(req.body.coordinations ?? [], null, 2))
   res.sendStatus(200)
 })
 

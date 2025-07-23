@@ -44,32 +44,8 @@ const AstroImageViewer: React.FC = () => {
     dec?: number
   } | null>(null) // 3D球面坐标，包含角度和RA/Dec坐标
   const [isSelectionMode, setIsSelectionMode] = useState(false)
-  const [selectionStart, setSelectionStart] = useState<{
-    x: number
-    y: number
-  } | null>(null)
-  const [currentSelection, setCurrentSelection] = useState<{
-    x: number
-    y: number
-  } | null>(null)
-
-  // 禁止页面滚动（Select模式下）
-  useEffect(() => {
-    let originalOverflow: string | undefined
-    if (isSelectionMode) {
-      originalOverflow = document.body.style.overflow
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
-    return () => {
-      if (isSelectionMode && originalOverflow !== undefined) {
-        document.body.style.overflow = originalOverflow
-      } else {
-        document.body.style.overflow = ''
-      }
-    }
-  }, [isSelectionMode])
+  const [selectionStart, setSelectionStart] = useState<{ x: number; y: number } | null>(null)
+  const [currentSelection, setCurrentSelection] = useState<{ x: number; y: number } | null>(null)
 
   // Telescope selection state - sorted alphabetically by ASCII
   const [telescopes, setTelescopes] = useState<TelescopeOption[]>([
@@ -105,24 +81,27 @@ const AstroImageViewer: React.FC = () => {
       .filter(Boolean)
   }
 
-  // Prepare payload for Retrieve action (with region)
+  // Prepare payload for Retrieve action (separate Telescopes/Filters and Coordinations)
   const prepareRetrievePayload = () => {
     const selectedTelescopes = telescopes
       .filter((t) => t.selected)
       .map((t) => t.label)
     const selectedFilters = getSelectedFilters()
-    const region = getRegionFromPreview()
-    const payload = selectedTelescopes.map((telescope) => {
+    const coordinations = getRegionFromPreview()
+    // Always return both keys, with empty array if nothing selected
+    const telescopesAndFilters = selectedTelescopes.map((telescope) => {
       const map = TELESCOPE_FILTER_DB_MAP[telescope]
       return {
         telescope,
         db: map?.db,
         column: map?.column,
         filters: selectedFilters[telescope] || [],
-        region,
       }
     })
-    return payload
+    return {
+      telescopesAndFilters,
+      coordinations,
+    }
   }
 
   // Updated filter data to match specifications - sorted alphabetically by ASCII
@@ -377,6 +356,15 @@ const AstroImageViewer: React.FC = () => {
       )
       setPreviewData(newPreviewData)
       setSelectionWarning(clipped)
+
+      // Retrieve logic: send payload to test window and server.cjs
+      const payload = prepareRetrievePayload()
+      setTestLog(payload)
+      fetch('http://localhost:3001/api/log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      }).catch(() => {})
 
       // Exit selection mode
       setIsSelectionMode(false)
@@ -691,27 +679,6 @@ const AstroImageViewer: React.FC = () => {
                 style={{ margin: '8px 0' }}
               />
             )}
-            <Button
-              type="primary"
-              icon={<SearchOutlined />}
-              size="small"
-              style={{ width: '100%', marginTop: '12px' }}
-              onClick={async () => {
-                const payload = prepareRetrievePayload()
-                setTestLog(payload) // 新增：保存到测试窗口
-                try {
-                  await fetch('http://localhost:3001/api/log', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                  })
-                } catch (e) {
-                  // console.warn('Log server not available:', e)
-                }
-              }}
-            >
-              Retrieve
-            </Button>
           </Card>
           <Card title="Retrieved Data" className={style.dataCard}>
             <List
