@@ -1,12 +1,13 @@
-import { EyeOutlined, SearchOutlined } from '@ant-design/icons'
+import { EyeOutlined } from '@ant-design/icons'
 import { Card, Button, Checkbox, List, Typography, Row, Col, Alert } from 'antd'
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef } from 'react'
 
 import CelestialSphere from '@/components/CelestialSphere'
 import { TELESCOPE_FILTER_DB_MAP } from '@/constants/telescopeDbMap'
 import { sphereToRaDecStandard } from '@/utils/wcs'
 
 import style from './index.module.scss'
+import SelectionBox from '@/components/SelectionBox'
 const { Title, Text } = Typography
 
 interface FilterOption {
@@ -246,19 +247,9 @@ const AstroImageViewer: React.FC = () => {
       const rect = mainImageRef.current.getBoundingClientRect()
       const x = event.clientX - rect.left
       const y = event.clientY - rect.top
-
-      // Only allow selection within the sphere
-      const centerX = rect.width / 2
-      const centerY = rect.height / 2
-      const radius = Math.min(centerX, centerY)
-      const distanceFromCenter = Math.sqrt(
-        (x - centerX) ** 2 + (y - centerY) ** 2,
-      )
-
-      if (distanceFromCenter <= radius) {
-        setSelectionStart({ x, y })
-        setCurrentSelection({ x, y })
-      }
+      // 允许在整个containerRect范围内起始画框
+      setSelectionStart({ x, y })
+      setCurrentSelection({ x, y })
     }
   }
 
@@ -269,95 +260,7 @@ const AstroImageViewer: React.FC = () => {
 
   const handleMouseUp = (event: React.MouseEvent<HTMLDivElement>) => {
     if (isSelectionMode && selectionStart && mainImageRef.current) {
-      const rect = mainImageRef.current.getBoundingClientRect()
-      let x = event.clientX - rect.left
-      let y = event.clientY - rect.top
-
-      // Only complete selection within the sphere
-      const centerX = rect.width / 2
-      const centerY = rect.height / 2
-      const radius = Math.min(centerX, centerY)
-      // const distanceFromCenter = Math.sqrt(
-      //   (x - centerX) ** 2 + (y - centerY) ** 2,
-      // )
-
-      // Calculate the four corners of the selection rectangle
-      let minX = Math.min(selectionStart.x, x)
-      let maxX = Math.max(selectionStart.x, x)
-      let minY = Math.min(selectionStart.y, y)
-      let maxY = Math.max(selectionStart.y, y)
-
-      // Convert to sphere coordinates (normalized -1 to 1)
-      const normMinX = (minX - centerX) / radius
-      const normMaxX = (maxX - centerX) / radius
-      const normMinY = -(minY - centerY) / radius // Invert Y for astronomical convention
-      const normMaxY = -(maxY - centerY) / radius
-
-      // 统一像素坐标转球面坐标再转RA/Dec的逻辑（标准WCS实现）
-      const convertPixelToRaDec = (sphereX: number, sphereY: number) => {
-        const sphereZ = Math.sqrt(Math.max(0, 1 - sphereX * sphereX - sphereY * sphereY))
-        const coords = sphereToRaDecStandard(sphereX, sphereY, sphereZ)
-        return { ra: Number(coords.ra), dec: Number(coords.dec) }
-      }
-
-      // Calculate RA/Dec for each corner
-      let corners = [
-        convertPixelToRaDec(normMinX, normMaxY), // Top-left
-        convertPixelToRaDec(normMaxX, normMaxY), // Top-right
-        convertPixelToRaDec(normMaxX, normMinY), // Bottom-right
-        convertPixelToRaDec(normMinX, normMinY), // Bottom-left
-      ].filter(Boolean) as {ra: number, dec: number}[]
-
-      // 计算RA/Dec极值
-      let raList = corners.map(c => c.ra < 0 ? c.ra + 360 : c.ra)
-      let decList = corners.map(c => c.dec)
-      let raMin = Math.min(...raList)
-      let raMax = Math.max(...raList)
-      let decMin = Math.min(...decList)
-      let decMax = Math.max(...decList)
-      let deltaRA = raMax - raMin
-      // RA回绕修正
-      if (deltaRA > 180) deltaRA = 360 - deltaRA
-      let deltaDec = decMax - decMin
-
-      let clipped = false
-      // 超限则截断
-      if (deltaRA > RA_LIMIT) {
-        // 截断X方向
-        const midX = (minX + maxX) / 2
-        const halfWidth = Math.abs((RA_LIMIT / 360) * (2 * radius)) / 2
-        minX = Math.max(centerX - radius, midX - halfWidth)
-        maxX = Math.min(centerX + radius, midX + halfWidth)
-        clipped = true
-      }
-      if (deltaDec > DEC_LIMIT) {
-        // 截断Y方向
-        const midY = (minY + maxY) / 2
-        const halfHeight = Math.abs((DEC_LIMIT / 2) * (2 * radius) / 180) // 1度对应180像素
-        minY = Math.max(centerY - radius, midY - halfHeight)
-        maxY = Math.min(centerY + radius, midY + halfHeight)
-        clipped = true
-      }
-
-      // 重新计算四角
-      const normMinX2 = (minX - centerX) / radius
-      const normMaxX2 = (maxX - centerX) / radius
-      const normMinY2 = -(minY - centerY) / radius
-      const normMaxY2 = -(maxY - centerY) / radius
-      corners = [
-        convertPixelToRaDec(normMinX2, normMaxY2),
-        convertPixelToRaDec(normMaxX2, normMaxY2),
-        convertPixelToRaDec(normMaxX2, normMinY2),
-        convertPixelToRaDec(normMinX2, normMinY2),
-      ].filter(Boolean) as {ra: number, dec: number}[]
-      // 更新预览
-      const newPreviewData = corners.map((c, idx) =>
-        c ? `RA: ${c.ra.toFixed(3)}°, Dec: ${c.dec.toFixed(3)}°` : `Corner${idx+1} invalid`
-      )
-      setPreviewData(newPreviewData)
-      setSelectionWarning(clipped)
-
-      // Retrieve logic: send payload to test window and server.cjs
+      // 选区结束后，发送后端请求、重置状态（选区坐标和预览已由 SelectionBox 实时更新）
       const payload = prepareRetrievePayload()
       setTestLog(payload)
       fetch('http://localhost:3001/api/log', {
@@ -366,7 +269,6 @@ const AstroImageViewer: React.FC = () => {
         body: JSON.stringify(payload),
       }).catch(() => {})
 
-      // Exit selection mode
       setIsSelectionMode(false)
       setSelectionStart(null)
       setCurrentSelection(null)
@@ -606,21 +508,27 @@ const AstroImageViewer: React.FC = () => {
                   showCoordinates={true}
                   currentCoordinates={
                     worldPosition &&
-                    worldPosition.ra !== undefined &&
-                    worldPosition.dec !== undefined
+                    typeof worldPosition.ra === 'number' &&
+                    typeof worldPosition.dec === 'number'
                       ? { ra: worldPosition.ra, dec: worldPosition.dec }
-                      : null
+                      : undefined
                   }
                 />
                 {/* Selection rectangle overlay */}
-                {isSelectionMode && selectionStart && currentSelection && (
-                  <div
+                {isSelectionMode && selectionStart && currentSelection && mainImageRef.current && (
+                  <SelectionBox
+                    start={selectionStart}
+                    end={currentSelection}
                     className={style.selectionRectangle}
-                    style={{
-                      left: Math.min(selectionStart.x, currentSelection.x),
-                      top: Math.min(selectionStart.y, currentSelection.y),
-                      width: Math.abs(currentSelection.x - selectionStart.x),
-                      height: Math.abs(currentSelection.y - selectionStart.y),
+                    containerRect={mainImageRef.current.getBoundingClientRect()}
+                    sphereToRaDec={sphereToRaDecStandard}
+                    raLimit={RA_LIMIT}
+                    decLimit={DEC_LIMIT}
+                    onChange={(corners, warning) => {
+                      setPreviewData(
+                        corners.map((c) => `RA: ${c.ra.toFixed(3)}°, Dec: ${c.dec.toFixed(3)}°`)
+                      )
+                      setSelectionWarning(warning)
                     }}
                   />
                 )}
@@ -628,7 +536,8 @@ const AstroImageViewer: React.FC = () => {
                 {isSelectionMode && (
                   <div className={style.selectionOverlay}>
                     <div className={style.selectionInstructions}>
-                      Click and drag to select an area
+                      框选区域以选取天区<br />
+                      按住鼠标左键拖动，释放后即取回坐标及图像
                     </div>
                   </div>
                 )}

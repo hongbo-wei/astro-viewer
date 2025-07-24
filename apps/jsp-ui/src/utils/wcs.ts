@@ -162,12 +162,16 @@ export function sphereToRaDecStandard(
   x: number,
   y: number,
   z: number,
-): WCSCoordinates {
+): WCSCoordinates | null {
   // 标准化到单位球面
   const length = Math.sqrt(x * x + y * y + z * z)
+  if (!isFinite(length) || length === 0) return null
   const nx = x / length
   const ny = y / length
   const nz = z / length
+  // 防止非法ny
+  if (!isFinite(nx) || !isFinite(ny) || !isFinite(nz)) return null
+  if (ny < -1 || ny > 1) return null
 
   // 使用标准的球坐标转换
   // 其中 Y 轴指向北极，X-Z 平面是赤道面

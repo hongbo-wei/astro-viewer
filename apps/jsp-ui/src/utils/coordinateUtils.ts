@@ -24,8 +24,8 @@ export interface RaDecCoordinates {
 export interface SphereCoordinatesWithAngles extends SphereCoordinates {
   phi: number
   theta: number
-  ra: number
-  dec: number
+  ra: number | null
+  dec: number | null
 }
 
 /**
@@ -84,19 +84,16 @@ export function screenToSphere(
  */
 export function sphereToRaDec(
   sphereCoords: SphereCoordinates,
-): RaDecCoordinates {
+): RaDecCoordinates | null {
   const coords = sphereToRaDecStandard(
     sphereCoords.x,
     sphereCoords.y,
     sphereCoords.z,
   )
-
-  // 验证坐标有效性
-  if (!validateCoordinates(coords)) {
-    console.warn('生成的坐标无效:', coords)
-    return { ra: 0, dec: 0 }
+  if (!coords || !validateCoordinates(coords)) {
+    // console.warn('生成的坐标无效:', coords)
+    return null
   }
-
   return coords
 }
 
@@ -145,8 +142,8 @@ export function createSphereCoordinates(intersectionPoint: {
     z: normalizedPoint.z,
     phi,
     theta,
-    ra: raDec.ra,
-    dec: raDec.dec,
+    ra: raDec ? raDec.ra : null,
+    dec: raDec ? raDec.dec : null,
   }
 }
 
@@ -181,7 +178,7 @@ export function formatDebugInfo(
 坐标转换详情:
 - 球面坐标: (${sphereCoords.x.toFixed(4)}, ${sphereCoords.y.toFixed(4)}, ${sphereCoords.z.toFixed(4)})
 - 屏幕坐标: (${screenCoords.x.toFixed(1)}, ${screenCoords.y.toFixed(1)})
-- RA/Dec: (${sphereCoords.ra.toFixed(3)}°, ${sphereCoords.dec.toFixed(3)}°)
+- RA/Dec: (${sphereCoords.ra !== null ? sphereCoords.ra.toFixed(3) : 'N/A'}°, ${sphereCoords.dec !== null ? sphereCoords.dec.toFixed(3) : 'N/A'}°)
 - 球面角度: φ=${sphereCoords.phi.toFixed(4)}, θ=${sphereCoords.theta.toFixed(4)}
 - 容器尺寸: ${containerInfo.width}×${containerInfo.height}
   `.trim()
