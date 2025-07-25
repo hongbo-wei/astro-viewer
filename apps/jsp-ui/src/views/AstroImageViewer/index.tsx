@@ -3,6 +3,7 @@ import { Card, Button, Checkbox, List, Typography, Row, Col, Alert } from 'antd'
 import React, { useState, useRef } from 'react'
 
 import CelestialSphere from '@/components/CelestialSphere'
+import { getRaDecByRaycast } from '@/utils/raycastUtils'
 import { TELESCOPE_FILTER_DB_MAP } from '@/constants/telescopeDbMap'
 import { sphereToRaDecStandard } from '@/utils/wcs'
 
@@ -35,6 +36,7 @@ interface TelescopeOption {
 
 const AstroImageViewer: React.FC = () => {
   const mainImageRef = useRef<HTMLDivElement>(null)
+  const celestialRef = useRef<any>(null)
   const [worldPosition, setWorldPosition] = useState<{
     x: number
     y: number
@@ -203,23 +205,12 @@ const AstroImageViewer: React.FC = () => {
     if (mainImageRef.current) {
       const rect = mainImageRef.current.getBoundingClientRect()
       // Convert pixel coordinates to sphere coordinates (centered and normalized)
-      const centerX = rect.width / 2
-      const centerY = rect.height / 2
       const x = event.clientX - rect.left
       const y = event.clientY - rect.top
-      const radius = Math.min(centerX, centerY)
 
-      // Calculate distance from center
-      const distanceFromCenter = Math.sqrt(
-        (x - centerX) ** 2 + (y - centerY) ** 2,
-      )
-
-      // Only update coordinates if within the sphere
-      if (distanceFromCenter <= radius) {
-        // Update current selection if in selection mode
-        if (isSelectionMode && selectionStart) {
-          setCurrentSelection({ x, y })
-        }
+      // Update current selection if in selection mode
+      if (isSelectionMode && selectionStart) {
+        setCurrentSelection({ x, y })
       }
     }
   } 
@@ -501,6 +492,7 @@ const AstroImageViewer: React.FC = () => {
                 style={{ cursor: isSelectionMode ? 'crosshair' : 'default' }}
               >
                 <CelestialSphere
+                  ref={celestialRef}
                   selectedTelescopes={telescopes
                     .filter((t) => t.selected)
                     .map((t) => t.key)}
@@ -515,13 +507,15 @@ const AstroImageViewer: React.FC = () => {
                   }
                 />
                 {/* Selection rectangle overlay */}
-                {isSelectionMode && selectionStart && currentSelection && mainImageRef.current && (
+                {isSelectionMode && selectionStart && currentSelection && mainImageRef.current && celestialRef.current && celestialRef.current.getCamera() && celestialRef.current.getSphere() && (
                   <SelectionBox
                     start={selectionStart}
                     end={currentSelection}
                     className={style.selectionRectangle}
                     containerRect={mainImageRef.current.getBoundingClientRect()}
-                    sphereToRaDec={sphereToRaDecStandard}
+                    getRaDecByRaycast={getRaDecByRaycast}
+                    camera={celestialRef.current.getCamera()}
+                    sphere={celestialRef.current.getSphere()}
                     raLimit={RA_LIMIT}
                     decLimit={DEC_LIMIT}
                     onChange={(corners, warning) => {

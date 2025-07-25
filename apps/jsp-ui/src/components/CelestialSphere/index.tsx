@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect, useState, useImperativeHandle, forwardRef } from 'react'
 import * as THREE from 'three'
 
 import { createSphereCoordinates } from '@/utils/coordinateUtils'
@@ -11,7 +11,6 @@ interface CelestialSphereProps {
   className?: string
   enableRotation?: boolean // New prop to control rotation
   selectedTelescopes?: string[] // 选中的望远镜列表
-  onThumbnailUpdate?: (thumbnailUrl: string) => void // Callback for thumbnail updates
   onRaycast?: (
     intersectionPoint: THREE.Vector3 | null,
     sphereCoords: any,
@@ -28,15 +27,14 @@ const TELESCOPE_COLORS = {
   wise: 0xd0021b, // 红色
 }
 
-const CelestialSphere: React.FC<CelestialSphereProps> = ({
+const CelestialSphere = forwardRef<any, CelestialSphereProps>(({
   className = '',
   selectedTelescopes,
-  onThumbnailUpdate,
   onRaycast,
   showCoordinates = false,
   currentCoordinates = null,
   enableRotation = true, // 默认允许旋转
-}) => {
+}, ref) => {
   const mountRef = useRef<HTMLDivElement>(null)
   const sceneRef = useRef<THREE.Scene | null>(null)
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null)
@@ -47,6 +45,13 @@ const CelestialSphere: React.FC<CelestialSphereProps> = ({
   const coverageGroupRef = useRef<THREE.Group>(new THREE.Group()) // 覆盖范围组
   const [isLoading, setIsLoading] = useState(true)
   const [showControls, setShowControls] = useState(false)
+
+  // 导出内部 cameraRef 和 celestialSphereRef，便于父组件 SelectionBox 通过 ref 获取 3D 射线投射所需对象
+  useImperativeHandle(ref, () => ({
+    getCamera: () => cameraRef.current,
+    getSphere: () => celestialSphereRef.current,
+    getMount: () => mountRef.current,
+  }))
 
   // 创建望远镜覆盖范围几何体
   const createCoverageGeometry = (telescope: string) => {
@@ -292,29 +297,9 @@ const CelestialSphere: React.FC<CelestialSphereProps> = ({
 
     setupControls()
 
+
     // Set loading to false after setup
     setTimeout(() => setIsLoading(false), 1000)
-
-    // Function to generate thumbnail with throttling
-    let lastThumbnailTime = 0
-    const thumbnailThrottle = 500 // Generate thumbnail at most every 500ms
-
-    const generateThumbnail = () => {
-      const now = Date.now()
-      if (
-        renderer &&
-        onThumbnailUpdate &&
-        now - lastThumbnailTime > thumbnailThrottle
-      ) {
-        try {
-          const thumbnailUrl = renderer.domElement.toDataURL('image/png', 0.6) // Lower quality for better performance
-          onThumbnailUpdate(thumbnailUrl)
-          lastThumbnailTime = now
-        } catch (error) {
-          // console.warn('Failed to generate thumbnail:', error)
-        }
-      }
-    }
 
     // Animation loop
     const animate = () => {
@@ -330,19 +315,9 @@ const CelestialSphere: React.FC<CelestialSphereProps> = ({
       // }
 
       renderer.render(scene, camera)
-
-      // Generate thumbnail less frequently
-      if (frameRef.current && frameRef.current % 120 === 0) {
-        generateThumbnail()
-      }
     }
 
     animate()
-
-    // 生成初始缩略图
-    setTimeout(() => {
-      generateThumbnail()
-    }, 100)
 
     // Handle window resize
     const handleResize = () => {
@@ -475,6 +450,6 @@ const CelestialSphere: React.FC<CelestialSphereProps> = ({
       </div>
     </div>
   )
-}
+})
 
 export default CelestialSphere
