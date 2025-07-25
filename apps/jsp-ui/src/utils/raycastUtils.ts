@@ -37,3 +37,24 @@ export function getRaDecByRaycast(
   }
   return null
 }
+
+/**
+ * 统一像素转 RA/Dec 工具函数
+ * @param x 像素x（相对于 container 左上角）
+ * @param y 像素y（相对于 container 左上角）
+ * @param containerRef 容器 ref（如 mainImageRef 或 mountRef）
+ * @param camera THREE.PerspectiveCamera
+ * @param sphere THREE.Mesh
+ * @returns { ra: number, dec: number } | null
+ */
+export function pixelToRaDec(
+  x: number,
+  y: number,
+  containerRef: React.RefObject<HTMLElement>,
+  camera: THREE.PerspectiveCamera,
+  sphere: THREE.Mesh
+): { ra: number; dec: number } | null {
+  if (!containerRef.current) return null;
+  const rect = containerRef.current.getBoundingClientRect();
+  return getRaDecByRaycast(x, y, rect, camera, sphere);
+}

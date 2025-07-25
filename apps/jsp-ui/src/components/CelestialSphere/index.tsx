@@ -419,13 +419,13 @@ const CelestialSphere = forwardRef<any, CelestialSphereProps>(({
         </div>
       )}
 
-      {/* 重置视角按钮 - 移动到右上角 */}
+      {/* 重置视角按钮 - 移动到左上角 */}
       <button
         className={styles.resetButton}
         onClick={resetCameraPosition}
         title="Reset Camera Position"
       >
-        🎯
+        🔄
       </button>
 
       {/* 坐标信息显示 - 添加到右上角 */}
@@ -443,10 +443,10 @@ const CelestialSphere = forwardRef<any, CelestialSphereProps>(({
       <div
         className={`${styles.controlsInfo} ${showControls ? styles.visible : styles.hidden}`}
       >
-        <div>🖱️ Drag to rotate</div>
-        <div>🔍 Scroll to zoom</div>
-        <div>⌨️ Right-click + drag to pan</div>
-        <div>🎯 Click to reset view</div>
+        <div>Drag to rotate</div>
+        <div>Scroll to zoom</div>
+        <div>Right-click + drag to pan</div>
+        <div>Click 🔄 to reset view</div>
       </div>
     </div>
   )

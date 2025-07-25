@@ -1,5 +1,7 @@
 import React from 'react'
+import styles from './index.module.scss'
 import type * as THREE from 'three'
+import { pixelToRaDec } from '@/utils/raycastUtils'
 
 /**
  * SelectionBox 选区组件
@@ -41,9 +43,27 @@ const SelectionBox: React.FC<SelectionBoxProps> = ({ start, end, className, cont
   const height = Math.abs(end.y - start.y)
 
   // 用 useMemo 计算 corners/center，避免副作用死循环
+  // 统一调用 pixelToRaDec，保证参数来源一致
+  const containerRef = React.useRef<HTMLElement | null>(null)
+  React.useEffect(() => {
+    // 兼容原有 containerRect 传递方式，自动挂载 ref
+    if (containerRect && containerRect instanceof DOMRect && containerRef.current == null) {
+      // 尝试通过 sphere.parentElement 查找 DOM
+      if ((sphere as any)?.parent?.element) {
+        containerRef.current = (sphere as any).parent.element as HTMLElement
+      }
+    }
+  }, [containerRect, sphere])
   const convert = React.useCallback(
-    (x: number, y: number) => getRaDecByRaycast(x, y, containerRect, camera, sphere),
-    [getRaDecByRaycast, containerRect, camera, sphere]
+    (x: number, y: number) => {
+      // 优先用传入的 containerRef
+      if (containerRef.current) {
+        return pixelToRaDec(x, y, containerRef, camera, sphere)
+      }
+      // 兼容老逻辑
+      return getRaDecByRaycast(x, y, containerRect, camera, sphere)
+    },
+    [containerRef, camera, sphere, containerRect, getRaDecByRaycast]
   )
   const fallback = convert(start.x, start.y) || { ra: 0, dec: 0 }
   const minX = left
@@ -125,14 +145,12 @@ const SelectionBox: React.FC<SelectionBoxProps> = ({ start, end, className, cont
 
   return (
     <div
-      className={className}
+      className={className ? `${styles.selectionBox} ${className}` : styles.selectionBox}
       style={{
-        position: 'absolute',
         left,
         top,
         width,
         height,
-        pointerEvents: 'none',
       }}
     />
   )

@@ -3,9 +3,8 @@ import { Card, Button, Checkbox, List, Typography, Row, Col, Alert } from 'antd'
 import React, { useState, useRef } from 'react'
 
 import CelestialSphere from '@/components/CelestialSphere'
-import { getRaDecByRaycast } from '@/utils/raycastUtils'
+import { getRaDecByRaycast, pixelToRaDec } from '@/utils/raycastUtils'
 import { TELESCOPE_FILTER_DB_MAP } from '@/constants/telescopeDbMap'
-import { sphereToRaDecStandard } from '@/utils/wcs'
 
 import style from './index.module.scss'
 import SelectionBox from '@/components/SelectionBox'
@@ -37,16 +36,9 @@ interface TelescopeOption {
 const AstroImageViewer: React.FC = () => {
   const mainImageRef = useRef<HTMLDivElement>(null)
   const celestialRef = useRef<any>(null)
-  const [worldPosition, setWorldPosition] = useState<{
-    x: number
-    y: number
-    z: number
-    phi?: number
-    theta?: number
-    ra?: number
-    dec?: number
-  } | null>(null) // 3D球面坐标，包含角度和RA/Dec坐标
+  // 已移除 worldPosition 变量（未被使用）
   const [isSelectionMode, setIsSelectionMode] = useState(false)
+  const [lastSelectionCorners, setLastSelectionCorners] = useState<Array<{ ra: number; dec: number }>>([])
   const [selectionStart, setSelectionStart] = useState<{ x: number; y: number } | null>(null)
   const [currentSelection, setCurrentSelection] = useState<{ x: number; y: number } | null>(null)
 
@@ -90,7 +82,7 @@ const AstroImageViewer: React.FC = () => {
       .filter((t) => t.selected)
       .map((t) => t.label)
     const selectedFilters = getSelectedFilters()
-    const coordinations = getRegionFromPreview()
+    const coordinations = lastSelectionCorners.length > 0 ? lastSelectionCorners : []
     // Always return both keys, with empty array if nothing selected
     const telescopesAndFilters = selectedTelescopes.map((telescope) => {
       const map = TELESCOPE_FILTER_DB_MAP[telescope]
@@ -151,9 +143,7 @@ const AstroImageViewer: React.FC = () => {
     { id: '1', name: 'Item 1' },
     { id: '2', name: 'Item 2' },
     { id: '3', name: 'Item 3' },
-    { id: '4', name: 'Item 4' },
-    { id: '5', name: 'Item 5' },
-    { id: '6', name: 'Item 6' },
+    { id: '4', name: 'View More' },
   ])
 
   const [retrievedImages] = useState<RetrievedImage[]>([
@@ -162,14 +152,13 @@ const AstroImageViewer: React.FC = () => {
     { id: '3', url: '/api/placeholder/150/100', title: 'Image 3' },
     { id: '4', url: '/api/placeholder/150/100', title: 'Image 4' },
     { id: '5', url: '/api/placeholder/150/100', title: 'Image 5' },
-    { id: '6', url: '/api/placeholder/150/100', title: 'Image 6' },
   ])
 
-  const [previewData, setPreviewData] = useState([
-    'RA 1, Dec 1',
-    'RA 2, Dec 2',
-    'RA 3, Dec 3',
-    'RA 4, Dec 4',
+  const [previewData, setPreviewData] = useState<string[]>([
+    'RA: , Dec: ',
+    'RA: , Dec: ',
+    'RA: , Dec: ',
+    'RA: , Dec: ',
   ])
 
   // 新增：用于测试窗口的 state
@@ -201,44 +190,34 @@ const AstroImageViewer: React.FC = () => {
     )
   }
 
+  // 鼠标移动时，统一用 pixelToRaDec 计算 RA/Dec，基准以 mainImageRef 为准
+  const [hoverRaDec, setHoverRaDec] = useState<{ ra: number; dec: number } | null>(null)
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (mainImageRef.current) {
+    if (mainImageRef.current && celestialRef.current && celestialRef.current.getCamera && celestialRef.current.getSphere) {
       const rect = mainImageRef.current.getBoundingClientRect()
-      // Convert pixel coordinates to sphere coordinates (centered and normalized)
       const x = event.clientX - rect.left
       const y = event.clientY - rect.top
-
-      // Update current selection if in selection mode
+      // 悬浮坐标
+      const raDec = pixelToRaDec(x, y, mainImageRef, celestialRef.current.getCamera(), celestialRef.current.getSphere())
+      setHoverRaDec(raDec)
+      // SelectionBox 框选实时更新
       if (isSelectionMode && selectionStart) {
         setCurrentSelection({ x, y })
       }
     }
-  } 
-
-  // 处理3D射线投射结果 - 使用统一的坐标转换工具
-  const handleRaycast = (intersectionPoint: any, sphereCoords: any) => {
-    if (intersectionPoint && sphereCoords && mainImageRef.current) {
-      // 直接使用射线投射的结果，避免额外的坐标转换误差
-      setWorldPosition({
-        x: sphereCoords.x,
-        y: sphereCoords.y,
-        z: sphereCoords.z,
-        phi: sphereCoords.phi,
-        theta: sphereCoords.theta,
-        ra: sphereCoords.ra,
-        dec: sphereCoords.dec,
-      })
-    } else {
-      setWorldPosition(null)
-    }
   }
 
-  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
+  // 处理3D射线投射结果 - 使用统一的坐标转换工具
+  // 已移除 handleRaycast 内对 worldPosition 的操作（未被使用）
+  const handleRaycast = () => {
+    // no-op
+  }
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (isSelectionMode && mainImageRef.current) {
       const rect = mainImageRef.current.getBoundingClientRect()
-      const x = event.clientX - rect.left
-      const y = event.clientY - rect.top
-      // 允许在整个containerRect范围内起始画框
+      const x = e.clientX - rect.left
+      const y = e.clientY - rect.top
       setSelectionStart({ x, y })
       setCurrentSelection({ x, y })
     }
@@ -249,7 +228,7 @@ const AstroImageViewer: React.FC = () => {
   const DEC_LIMIT = 1 // deg
   const [selectionWarning, setSelectionWarning] = useState(false)
 
-  const handleMouseUp = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseUp = () => {
     if (isSelectionMode && selectionStart && mainImageRef.current) {
       // 选区结束后，发送后端请求、重置状态（选区坐标和预览已由 SelectionBox 实时更新）
       const payload = prepareRetrievePayload()
@@ -497,15 +476,15 @@ const AstroImageViewer: React.FC = () => {
                     .filter((t) => t.selected)
                     .map((t) => t.key)}
                   onRaycast={handleRaycast}
-                  showCoordinates={true}
-                  currentCoordinates={
-                    worldPosition &&
-                    typeof worldPosition.ra === 'number' &&
-                    typeof worldPosition.dec === 'number'
-                      ? { ra: worldPosition.ra, dec: worldPosition.dec }
-                      : undefined
-                  }
+                  showCoordinates={false} // 不再由 CelestialSphere 内部显示悬浮坐标
                 />
+                {/* 悬浮坐标框，单行自适应宽度，风格与 CelestialSphere 内部一致 */}
+                {hoverRaDec && (
+                  <div className={style.hoverRaDecBox}>
+                    RA: <span className="ra">{hoverRaDec.ra.toFixed(3)}°</span> &nbsp;|&nbsp; Dec: <span className="dec">{hoverRaDec.dec.toFixed(3)}°</span>
+                  </div>
+                )}
+                {/* ...existing code... */}
                 {/* Selection rectangle overlay */}
                 {isSelectionMode && selectionStart && currentSelection && mainImageRef.current && celestialRef.current && celestialRef.current.getCamera() && celestialRef.current.getSphere() && (
                   <SelectionBox
@@ -520,8 +499,9 @@ const AstroImageViewer: React.FC = () => {
                     decLimit={DEC_LIMIT}
                     onChange={(corners, warning) => {
                       setPreviewData(
-                        corners.map((c) => `RA: ${c.ra.toFixed(3)}°, Dec: ${c.dec.toFixed(3)}°`)
+                        corners.map((c) => `RA: ${c.ra.toFixed(6)}°, Dec: ${c.dec.toFixed(6)}°`)
                       )
+                      setLastSelectionCorners(corners) // 存储原始高精度数据
                       setSelectionWarning(warning)
                     }}
                   />
@@ -546,18 +526,28 @@ const AstroImageViewer: React.FC = () => {
               type="primary"
               size="small"
               onClick={handleSelectionButtonClick}
-              style={{ width: '100%', marginBottom: '12px' }}
+              className={style.selectionButton}
             >
               {isSelectionMode ? 'Cancel Selection' : 'Select'}
             </Button>
             <List
               size="small"
               dataSource={previewData}
-              renderItem={(item) => (
-                <List.Item className={style.coordinationItem}>
-                  <Text className={style.coordinationText}>{item}</Text>
-                </List.Item>
-              )}
+              renderItem={(item, idx) => {
+                let ra = '', dec = '';
+                const match = item.match(/RA[:\s]*([\d.\-]+)[^\d]+Dec[:\s]*([\d.\-]+)/i);
+                if (match) {
+                  ra = match[1] ?? '';
+                  dec = match[2] ?? '';
+                }
+                return (
+                  <div key={idx}>
+                    <div className={style.coordinationText}>RA: {ra}°</div>
+                    <div className={style.coordinationText}>Dec: {dec}°</div>
+                    {idx !== previewData.length - 1 && <hr style={{ margin: '6px 0', border: 0, borderTop: '1px solid #eee' }} />}
+                  </div>
+                );
+              }}
             />
             {isSelectionMode && (
               <Alert
@@ -571,7 +561,7 @@ const AstroImageViewer: React.FC = () => {
                 }
                 type="info"
                 showIcon={false}
-                style={{ margin: '8px 0' }}
+                className={style.alertInfo}
               />
             )}
             {selectionWarning && (
@@ -579,18 +569,9 @@ const AstroImageViewer: React.FC = () => {
                 message="已自动截断超出范围的选区"
                 type="warning"
                 showIcon
-                style={{ margin: '8px 0' }}
+                className={style.alertWarning}
               />
             )}
-          </Card>
-          <Card title="Retrieved Data" className={style.dataCard}>
-            <List
-              size="small"
-              dataSource={retrievedData}
-              renderItem={(item) => (
-                <List.Item className={style.dataItem}>{item.name}</List.Item>
-              )}
-            />
           </Card>
         </div>
       </div>
@@ -618,9 +599,21 @@ const AstroImageViewer: React.FC = () => {
           </Col>
         </Row>
       </Card>
+
+      {/* 横向 Retrieved Data 卡片 */}
+      <Card title="Retrieved Data" className={style.dataCard} style={{ margin: '16px 0' }}>
+        <List
+          size="small"
+          dataSource={retrievedData}
+          renderItem={(item) => (
+            <List.Item className={style.dataItem}>{item.name}</List.Item>
+          )}
+        />
+      </Card>
+
       {/* 测试窗口移到此处 */}
       <Card title="测试窗口（模拟server.cjs输出）" style={{ marginTop: 16 }}>
-        <pre style={{ maxHeight: 240, overflow: 'auto', background: '#f6f6f6', fontSize: 13 }}>
+        <pre className={style.testWindowPre}>
           {testLog ? JSON.stringify(testLog, null, 2) : '暂无数据'}
         </pre>
       </Card>

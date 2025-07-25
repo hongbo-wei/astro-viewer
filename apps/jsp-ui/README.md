@@ -1,244 +1,81 @@
-# JSP-UI - Astronomical Image Viewer
+# Astro Visualizer - JSP UI
 
-A modern web application for interactive astronomical data exploration featuring 3D celestial sphere visualization, multi-telescope data integration, and real-time coordinate-based image processing.
+这是 Astro Visualizer 项目的前端子项目，基于 React、TypeScript 和 Vite 构建，旨在提供天文数据的可视化界面。
 
-## ✨ Key Features
-
-### 🌐 3D Celestial Sphere Visualization
-- **Interactive 3D Universe**: Navigate through a Three.js-powered celestial sphere from the inside
-- **Real-time Raycast Detection**: Precise selection using 3D mouse interaction
-- **Coordinate System Integration**: Seamless conversion between pixel, 3D sphere, and RA/Dec coordinates
-- **Smooth Camera Controls**: OrbitControls with constrained movement within the sphere
-
-### 🔭 Multi-Telescope Data Integration
-- **Comprehensive Telescope Support**: Euclid, WISE, DESI, and 2MASS telescopes
-- **Dynamic Filter Management**: Each telescope shows its specific available filters
-- **Simultaneous Multi-telescope Selection**: Query multiple data sources concurrently
-- **Coordinated Data Retrieval**: Unified interface for diverse astronomical surveys
-
-### 🎯 Advanced Selection & Processing
-- **Interactive Region Selection**: Click and drag to define regions of interest on the 3D sphere
-- **Precise Coordinate Conversion**: Accurate transformation from screen coordinates to astronomical coordinates
-- **FITS Data Processing**: Automatic conversion of FITS files to web-compatible formats
-
-### 🔍 Enhanced User Experience
-- **Real-time Zoom View**: 5x magnified view with crosshair positioning
-- **Responsive Design**: Adaptive layout for desktop, tablet, and mobile devices
-- **Interactive Image Gallery**: Browse and analyze retrieved astronomical images
-- **Intuitive Controls**: User-friendly interface with contextual help
-
-## 💡 Technical Highlights
-
-### Advanced 3D Visualization
-- **Hardware-accelerated WebGL**: High-performance 3D rendering with optimized shaders
-- **Precision Raycasting**: Accurate 3D mouse interaction for celestial object selection
-- **Constrained Camera Movement**: Smooth navigation locked within the celestial sphere
-- **Responsive Rendering**: Adaptive quality based on device capabilities
-
-### Coordinate System Mastery
-- **Multi-system Integration**: Seamless conversion between pixel, 3D Cartesian, and celestial coordinates
-- **Real-time Transformation**: Live RA/Dec coordinate updates during interaction
-- **Boundary Validation**: Intelligent constraint checking for valid celestial regions
-- **Precision Algorithms**: Custom mathematical functions for accurate coordinate conversion
-
-### Performance Optimizations
-- **Efficient Rendering**: Optimized Three.js scene management and texture handling
-- **Smart Caching**: Intelligent data caching for improved response times
-- **Lazy Loading**: Progressive loading of large astronomical datasets
-- **Memory Management**: Proper cleanup of WebGL resources and event listeners
-
-### User Experience Innovation
-- **Intuitive 3D Navigation**: Natural interaction paradigms for 3D celestial exploration
-- **Real-time Feedback**: Immediate visual confirmation of user actions
-- **Contextual Help**: Built-in guidance for complex astronomical operations
-- **Responsive Design**: Seamless experience across all device types
-
-## 🔧 Development Workflow
-
-### Monorepo Architecture
-This application is part of the Joint Survey Processing (JSP) frontend monorepo:
-- **Package Management**: pnpm workspaces for efficient dependency management
-- **Build System**: Turbo for optimized build orchestration
-- **Code Quality**: Shared ESLint and TypeScript configurations
-- **Component Library**: Reusable UI components across projects
-
-### Code Quality & Standards
-- **TypeScript First**: Full type safety throughout the application
-- **Component Testing**: Comprehensive testing for critical UI components
-- **Code Formatting**: Automated formatting with Prettier
-- **Git Hooks**: Pre-commit quality checks and validation
-
-### Performance Monitoring
-- **Build Analysis**: Bundle size optimization and analysis
-- **Runtime Performance**: Three.js performance profiling
-- **Memory Usage**: WebGL resource monitoring
-- **User Experience**: Core Web Vitals tracking
-
-## 🚀 Getting Started
-
-### Prerequisites
-- **Node.js** 18+ 
-- **pnpm** v8.15.4 (recommended package manager)
-
-### Installation
-
-1. **Install pnpm globally**
-   ```bash
-   npm install -g pnpm
-   ```
-
-2. **Navigate to the project directory**
-   ```bash
-   cd apps/jsp-ui
-   ```
-
-3. **Install dependencies**
-   ```bash
-   pnpm install
-   ```
-
-4. **Start the development server**
-   ```bash
-   pnpm run dev
-   ```
-
-5. **Open your browser** and navigate to `http://localhost:5173`
-
-### Available Scripts
-
-- `pnpm run dev` - Start development server with hot reload
-- `pnpm run build` - Build for production
-- `pnpm run preview` - Preview production build locally  
-- `pnpm run lint` - Run ESLint for code quality checks
-- `pnpm run check` - Run TypeScript type checking
-
-### Project Structure Overview
+## 目录结构
 
 ```
 apps/jsp-ui/
-├── src/
-│   ├── components/
-│   │   ├── CelestialSphere/     # 3D visualization component
-│   │   └── TelescopeCoverage.tsx # Telescope coverage display
-│   ├── views/
-│   │   └── AstroImageViewer/    # Main application view
-│   ├── utils/
-│   │   ├── axios.ts             # HTTP client setup
-│   │   └── util.ts              # Utility functions
-│   ├── types/                   # TypeScript type definitions
-│   ├── hooks/                   # Custom React hooks
-│   └── constants/               # Application constants
-├── public/                      # Static assets
-├── ppt/                         # Project presentations
-└── Three.js学习指南.ipynb        # Three.js learning guide
+├── public/                # 静态资源
+├── src/                   # 源代码
+│   ├── components/        # 通用组件
+│   ├── constants/         # 常量定义
+│   ├── data/              # 示例数据
+│   ├── hooks/             # 自定义 hooks
+│   ├── routes/            # 路由配置
+│   ├── services/          # 数据服务
+│   ├── theme/             # 主题相关
+│   ├── types/             # 类型定义
+│   ├── utils/             # 工具函数
+│   └── views/             # 页面视图
+├── index.html             # 入口 HTML
+├── package.json           # 项目依赖与脚本
+├── tsconfig.json          # TypeScript 配置
+├── vite.config.ts         # Vite 配置
+└── ...
 ```
 
+## 快速开始
 
+请安装 pnpm@v8.15.4
+安装 `npm install -g pnpm`
 
-## 启动本地 Node 服务
-
-server.cjs 是本地 Node.js 服务脚本，通常用于：
-
-- 提供本地 API/mock 数据接口，支持前端开发和调试
-- 处理前端无法直接访问的文件（如 FITS 数据、跨域资源等）
-- 作为前后端联调的本地后端服务
-
-在项目根目录下执行以下命令启动服务：
+1. **安装依赖**
 
 ```bash
-node server.cjs
+pnpm install
 ```
 
-如需后台运行（不阻塞终端），可用：
+2. **启动开发服务器**
 
 ```bash
-node server.cjs &
+pnpm run dev
 ```
 
-项目页面在src/views目录下，可直接修改AstroImageViewer下index.tsx文件
+3. **访问应用**
 
-## Creating a New App
+打开浏览器访问 [http://localhost:5173](http://localhost:5173)（端口号以实际输出为准）。
 
-To create a new app in this monorepo:
+## 主要依赖
+- React
+- TypeScript
+- Vite
+- Three.js（用于三维可视化）
 
-```bash
-turbo gen workspace --copy
+## 项目脚本
+- `npm run dev` 启动开发服务器
+- `npm run build` 打包生产环境代码
+- `npm run preview` 预览打包后的应用
+
+
+## 系统架构图
+
+```mermaid
+flowchart LR
+  User[用户浏览器] -->|HTTP/HTTPS| JSPUI[前端 JSP UI]
+  JSPUI -->|REST API| Backend[后端服务]
+  Backend -->|数据库访问| DB[(数据库)]
+  Backend -->|文件存储| Storage[(天文数据存储)]
 ```
 
-This will scaffold a new workspace by copying from an existing template.
+> 上图展示了 Astro Visualizer 的主要架构：用户通过浏览器访问前端（JSP UI），前端通过 API 与后端服务通信，后端负责数据处理与存储。
 
-## Project Structure
+## 相关文档
+- `docs/WCS_UPGRADE_GUIDE.md`：WCS 升级指南
 
-```
-apps/jsp-ui/
-├── src/
-│   ├── views/
-│   │   └── AstroImageViewer/
-│   │       ├── index.tsx
-│   │       └── index.module.scss
-│   └── ...
-├── package.json
-└── README.md
-```
-
-## 📚 Learning Resources
-
-### Project Documentation
-- **System Architecture**: Detailed technical specifications in `SYSTEM_ARCHITECTURE.md`
-- **Three.js Guide**: Interactive learning notebook in `Three.js学习指南.ipynb`
-- **API Documentation**: Complete API reference for all components
-- **Presentation Materials**: Project overview slides in `ppt/` directory
-
-### Development Learning Path
-1. **Three.js Fundamentals**: 3D graphics and WebGL basics
-2. **Astronomical Coordinates**: RA/Dec system and conversions
-3. **React + TypeScript**: Modern frontend development patterns
-4. **Performance Optimization**: WebGL and React optimization techniques
-
-## 🤝 Contributing
-
-### Development Environment
-- Ensure Node.js 18+ and pnpm v8.15.4 are installed
-- Follow the existing code style and TypeScript conventions
-- Run tests and linting before submitting changes
-- Update documentation for new features
-
-### Code Structure Guidelines
-- Keep components focused and reusable
-- Use TypeScript interfaces for all props and state
-- Implement proper error handling and loading states
-- Optimize for performance, especially in 3D rendering code
-
-## FAQ: Console.log 输出在哪里？
-
-- 前端（React/浏览器）代码中的 `console.log` 只会显示在浏览器开发者工具的 Console 面板，不会显示在 VS Code 的 TERMINAL。
-- 只有后端（Node.js）代码中的 `console.log` 才会显示在 VS Code 的 TERMINAL。
-- 如果你想让前端数据出现在 VS Code 终端，需要将数据通过 HTTP 请求发送到后端，由后端打印。
-
-**示例：前端如何让数据出现在 VS Code 终端？**
-
-1. 前端调用 API：
-   ```js
-   fetch('/api/log', {
-     method: 'POST',
-     headers: { 'Content-Type': 'application/json' },
-     body: JSON.stringify(payload)
-   })
-   ```
-2. 后端收到后：
-   ```js
-   app.post('/api/log', (req, res) => {
-     console.log('前端传来的数据:', req.body)
-     res.sendStatus(200)
-   })
-   ```
-
-这样你就能在 VS Code 终端看到前端传来的数据了。
-
-## 📄 License
-
-This project is part of the Joint Survey Processing (JSP) initiative for astronomical data visualization and analysis.
+## 贡献
+欢迎提交 issue 和 PR 参与项目建设。
 
 ---
 
-*Built with ❤️ for the astronomical community*
+> 本项目为天文数据可视化平台的前端部分，后端与数据服务请参考主仓库说明。
