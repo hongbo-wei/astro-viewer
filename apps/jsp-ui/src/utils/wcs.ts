@@ -33,6 +33,14 @@ export interface WCSTransform {
   cd2_2: number
   ctype1: string // 坐标类型 (如 'RA---TAN')
   ctype2: string // 坐标类型 (如 'DEC--TAN')
+
+  // SIP正向畸变模型的核心参数
+  a_order: number // SIP多项式阶数
+  b_order: number // SIP多项式阶数
+
+  // 每像素在 RA/DEC方向的角度大小, 单位度/像素
+  cdelt1: number
+  cdelt2: number
 }
 
 /**
@@ -149,6 +157,10 @@ export function createDefaultWCS(): StandardWCS {
     cd2_2: 0.0001, // 度/像素
     ctype1: 'RA---TAN',
     ctype2: 'DEC--TAN',
+    a_order: 0, // SIP多项式阶数
+    b_order: 0, // SIP多项式阶数
+    cdelt1: 0.0001, // 每像素在 RA方向的
+    cdelt2: 0.0001, // 每像素在 DEC方向的角度大小
   }
 
   return new StandardWCS(transform)

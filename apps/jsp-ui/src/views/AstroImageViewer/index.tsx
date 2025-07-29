@@ -34,6 +34,12 @@ interface TelescopeOption {
 }
 
 const AstroImageViewer: React.FC = () => {
+  // JSP image display state
+  const [showJspImage, setShowJspImage] = useState(false)
+  // Fullscreen modal for JSP image
+  const [jspModalVisible, setJspModalVisible] = useState(false)
+  // Use dummy image for JSP display
+  const JSP_IMAGE_PATH = '/dummy-jsp-image.png' // Place the provided image in public/ as dummy-jsp-image.png
   const mainImageRef = useRef<HTMLDivElement>(null)
   const celestialRef = useRef<any>(null)
   // 已移除 worldPosition 变量（未被使用）
@@ -238,6 +244,9 @@ const AstroImageViewer: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       }).catch(() => {})
+
+      // Trigger JSP image display
+      setShowJspImage(true)
 
       setIsSelectionMode(false)
       setSelectionStart(null)
@@ -575,6 +584,70 @@ const AstroImageViewer: React.FC = () => {
           </Card>
         </div>
       </div>
+      {/* JSP Images Gallery */}
+      <Card title="JSP Images" className={style.imagesGallery} style={{ marginBottom: 16 }}>
+        {showJspImage ? (
+          <div style={{ textAlign: 'center', padding: '16px 0' }}>
+            <img
+              src={JSP_IMAGE_PATH}
+              alt="JSP Dummy"
+              style={{ maxWidth: '100%', maxHeight: 240, borderRadius: 8, boxShadow: '0 2px 8px #eee', cursor: 'pointer' }}
+              onClick={() => setJspModalVisible(true)}
+            />
+            <div style={{ marginTop: 8, color: '#888' }}>点击图片全屏显示</div>
+          </div>
+        ) : (
+          <div style={{ color: '#aaa', textAlign: 'center', padding: '24px 0' }}>
+            JSP images will be displayed here.
+          </div>
+        )}
+
+      {/* Fullscreen JSP image modal */}
+      {jspModalVisible && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            background: 'rgba(0,0,0,0.95)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          onClick={() => setJspModalVisible(false)}
+        >
+          <img
+            src={JSP_IMAGE_PATH}
+            alt="JSP Dummy Fullscreen"
+            style={{
+              maxWidth: '95vw',
+              maxHeight: '95vh',
+              borderRadius: 12,
+              boxShadow: '0 4px 32px #222',
+              background: '#111',
+            }}
+          />
+          <span
+            style={{
+              position: 'absolute',
+              top: 24,
+              right: 36,
+              color: '#fff',
+              fontSize: 32,
+              fontWeight: 700,
+              cursor: 'pointer',
+              zIndex: 10000,
+              textShadow: '0 2px 8px #000',
+            }}
+            onClick={() => setJspModalVisible(false)}
+          >×</span>
+        </div>
+      )}
+      </Card>
+
       {/* Bottom Retrieved Images Gallery */}
       <Card title="Retrieved Images" className={style.imagesGallery}>
         <Row gutter={[16, 16]} className={style.imageGrid}>
