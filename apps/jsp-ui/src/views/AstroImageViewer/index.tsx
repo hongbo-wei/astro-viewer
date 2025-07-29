@@ -40,6 +40,9 @@ const AstroImageViewer: React.FC = () => {
   const [jspModalVisible, setJspModalVisible] = useState(false)
   // Use dummy image for JSP display
   const JSP_IMAGE_PATH = '/dummy-jsp-image.png' // Place the provided image in public/ as dummy-jsp-image.png
+  // Placeholder for the real JSP image path from the server
+  // const [jspImagePath, setJspImagePath] = useState<string>('');
+  
   const mainImageRef = useRef<HTMLDivElement>(null)
   const celestialRef = useRef<any>(null)
   // 已移除 worldPosition 变量（未被使用）
@@ -591,7 +594,7 @@ const AstroImageViewer: React.FC = () => {
             <img
               src={JSP_IMAGE_PATH}
               alt="JSP Dummy"
-              style={{ maxWidth: '100%', maxHeight: 240, borderRadius: 8, boxShadow: '0 2px 8px #eee', cursor: 'pointer' }}
+              style={{ maxWidth: '100%', maxHeight: 600, borderRadius: 8, boxShadow: '0 2px 8px #eee', cursor: 'pointer' }}
               onClick={() => setJspModalVisible(true)}
             />
             <div style={{ marginTop: 8, color: '#888' }}>点击图片全屏显示</div>
