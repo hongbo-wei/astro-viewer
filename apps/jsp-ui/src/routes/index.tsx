@@ -22,11 +22,6 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       {
-        path: 'example',
-        element: <Example />,
-        param: { type: 'star' },
-      },
-      {
         path: 'astro-viewer',
         element: <AstroImageViewer />,
       },

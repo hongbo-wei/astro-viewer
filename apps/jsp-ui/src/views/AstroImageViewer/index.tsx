@@ -4,34 +4,26 @@ import React, { useState, useRef } from 'react'
 
 import CelestialSphere from '@/components/CelestialSphere'
 import { getRaDecByRaycast, pixelToRaDec } from '@/utils/raycastUtils'
-import { TELESCOPE_FILTER_DB_MAP } from '@/constants/telescopeDbMap'
+
+
+import {
+  FilterOption,
+  TelescopeOption,
+  RetrievedItem,
+  RetrievedImage,
+} from '@/types/astro'
+import {
+  initialTelescopes,
+  initialTwoMassFilters,
+  initialDesiFilters,
+  initialEuclidFilters,
+  initialWiseFilters,
+} from '@/constants/telescopeOptions'
+import { prepareRetrievePayload } from '@/utils/payloadUtils'
 
 import style from './index.module.scss'
 import SelectionBox from '@/components/SelectionBox'
 const { Title, Text } = Typography
-
-interface FilterOption {
-  key: string
-  label: string
-  checked: boolean
-}
-
-interface RetrievedItem {
-  id: string
-  name: string
-}
-
-interface RetrievedImage {
-  id: string
-  url: string
-  title: string
-}
-
-interface TelescopeOption {
-  key: string
-  label: string
-  selected: boolean
-}
 
 const AstroImageViewer: React.FC = () => {
   // JSP image display state
@@ -52,101 +44,13 @@ const AstroImageViewer: React.FC = () => {
   const [currentSelection, setCurrentSelection] = useState<{ x: number; y: number } | null>(null)
 
   // Telescope selection state - sorted alphabetically by ASCII
-  const [telescopes, setTelescopes] = useState<TelescopeOption[]>([
-    { key: 'twomass', label: '2MASS', selected: false },
-    { key: 'desi', label: 'DESI', selected: false },
-    { key: 'euclid', label: 'Euclid', selected: false },
-    { key: 'wise', label: 'WISE', selected: false },
-  ])
-  // Helper to get selected filters for each telescope
-  const getSelectedFilters = () => {
-    return {
-      '2MASS': twoMassFilters.filter((f) => f.checked).map((f) => f.key),
-      DESI: desiFilters.filter((f) => f.checked).map((f) => f.key),
-      Euclid: euclidFilters.filter((f) => f.checked).map((f) => f.key),
-      WISE: wiseFilters.filter((f) => f.checked).map((f) => f.key),
-    }
-  }
-
-  // Helper: parse previewData to region array
-  const getRegionFromPreview = () => {
-    // previewData: ["RA: 64.434°, Dec: 19.023°", ...]
-    return previewData
-      .map((item) => {
-        const match = item.match(/RA:\s*([\d.-]+)[^\d]+Dec:\s*([\d.-]+)/)
-        if (match) {
-          return {
-            ra: parseFloat(match[1] ?? ''),
-            dec: parseFloat(match[2] ?? ''),
-          }
-        }
-        return null
-      })
-      .filter(Boolean)
-  }
-
-  // Prepare payload for Retrieve action (separate Telescopes/Filters and Coordinations)
-  const prepareRetrievePayload = () => {
-    const selectedTelescopes = telescopes
-      .filter((t) => t.selected)
-      .map((t) => t.label)
-    const selectedFilters = getSelectedFilters()
-    const coordinations = lastSelectionCorners.length > 0 ? lastSelectionCorners : []
-    // Always return both keys, with empty array if nothing selected
-    const telescopesAndFilters = selectedTelescopes.map((telescope) => {
-      const map = TELESCOPE_FILTER_DB_MAP[telescope]
-      return {
-        telescope,
-        db: map?.db,
-        column: map?.column,
-        filters: selectedFilters[telescope] || [],
-      }
-    })
-    return {
-      telescopesAndFilters,
-      coordinations,
-    }
-  }
+  const [telescopes, setTelescopes] = useState<TelescopeOption[]>(initialTelescopes)
 
   // Updated filter data to match specifications - sorted alphabetically by ASCII
-  const [euclidFilters, setEuclidFilters] = useState<FilterOption[]>([
-    { key: 'DECAM_g', label: 'DECAM_g', checked: false },
-    { key: 'DECAM_i', label: 'DECAM_i', checked: false },
-    { key: 'DECAM_r', label: 'DECAM_r', checked: false },
-    { key: 'DECAM_z', label: 'DECAM_z', checked: false },
-    { key: 'HSC_g', label: 'HSC_g', checked: false },
-    { key: 'HSC_z', label: 'HSC_z', checked: false },
-    { key: 'MEGACAM_r', label: 'MEGACAM_r', checked: false },
-    { key: 'MEGACAM_u', label: 'MEGACAM_u', checked: false },
-    { key: 'NIR_H', label: 'NIR_H', checked: false },
-    { key: 'NIR_J', label: 'NIR_J', checked: false },
-    { key: 'NIR_Y', label: 'NIR_Y', checked: false },
-    { key: 'PANSTARRS_i', label: 'PANSTARRS_i', checked: false },
-  ])
-
-  const [wiseFilters, setWiseFilters] = useState<FilterOption[]>([
-    { key: '1', label: '1', checked: false },
-    { key: '2', label: '2', checked: false },
-    { key: '3', label: '3', checked: false },
-    { key: '4', label: '4', checked: false },
-  ])
-
-  const [twoMassFilters, setTwoMassFilters] = useState<FilterOption[]>([
-    { key: 'h', label: 'h', checked: false },
-    { key: 'j', label: 'j', checked: false },
-    { key: 'k', label: 'k', checked: false },
-  ])
-
-  const [desiFilters, setDesiFilters] = useState<FilterOption[]>([
-    { key: 'W1', label: 'W1', checked: false },
-    { key: 'W2', label: 'W2', checked: false },
-    { key: 'W3', label: 'W3', checked: false },
-    { key: 'W4', label: 'W4', checked: false },
-    { key: 'g', label: 'g', checked: false },
-    { key: 'i', label: 'i', checked: false },
-    { key: 'r', label: 'r', checked: false },
-    { key: 'z', label: 'z', checked: false },
-  ])
+  const [euclidFilters, setEuclidFilters] = useState<FilterOption[]>(initialEuclidFilters)
+  const [wiseFilters, setWiseFilters] = useState<FilterOption[]>(initialWiseFilters)
+  const [twoMassFilters, setTwoMassFilters] = useState<FilterOption[]>(initialTwoMassFilters)
+  const [desiFilters, setDesiFilters] = useState<FilterOption[]>(initialDesiFilters)
 
   const [retrievedData] = useState<RetrievedItem[]>([
     { id: '1', name: 'Item 1' },
@@ -240,7 +144,14 @@ const AstroImageViewer: React.FC = () => {
   const handleMouseUp = () => {
     if (isSelectionMode && selectionStart && mainImageRef.current) {
       // 选区结束后，发送后端请求、重置状态（选区坐标和预览已由 SelectionBox 实时更新）
-      const payload = prepareRetrievePayload()
+      const payload = prepareRetrievePayload(
+        telescopes,
+        twoMassFilters,
+        desiFilters,
+        euclidFilters,
+        wiseFilters,
+        lastSelectionCorners
+      )
       setTestLog(payload)
       fetch('http://localhost:3001/api/log', {
         method: 'POST',
@@ -269,47 +180,11 @@ const AstroImageViewer: React.FC = () => {
 
   // 在 AstroImageViewer 组件内添加重置函数
   const handleResetTelescopesAndFilters = () => {
-    setTelescopes([
-      { key: 'twomass', label: '2MASS', selected: false },
-      { key: 'desi', label: 'DESI', selected: false },
-      { key: 'euclid', label: 'Euclid', selected: false },
-      { key: 'wise', label: 'WISE', selected: false },
-    ])
-    setTwoMassFilters([
-      { key: 'h', label: 'h', checked: false },
-      { key: 'j', label: 'j', checked: false },
-      { key: 'k', label: 'k', checked: false },
-    ])
-    setDesiFilters([
-      { key: 'W1', label: 'W1', checked: false },
-      { key: 'W2', label: 'W2', checked: false },
-      { key: 'W3', label: 'W3', checked: false },
-      { key: 'W4', label: 'W4', checked: false },
-      { key: 'g', label: 'g', checked: false },
-      { key: 'i', label: 'i', checked: false },
-      { key: 'r', label: 'r', checked: false },
-      { key: 'z', label: 'z', checked: false },
-    ])
-    setEuclidFilters([
-      { key: 'DECAM_g', label: 'DECAM_g', checked: false },
-      { key: 'DECAM_i', label: 'DECAM_i', checked: false },
-      { key: 'DECAM_r', label: 'DECAM_r', checked: false },
-      { key: 'DECAM_z', label: 'DECAM_z', checked: false },
-      { key: 'HSC_g', label: 'HSC_g', checked: false },
-      { key: 'HSC_z', label: 'HSC_z', checked: false },
-      { key: 'MEGACAM_r', label: 'MEGACAM_r', checked: false },
-      { key: 'MEGACAM_u', label: 'MEGACAM_u', checked: false },
-      { key: 'NIR_H', label: 'NIR_H', checked: false },
-      { key: 'NIR_J', label: 'NIR_J', checked: false },
-      { key: 'NIR_Y', label: 'NIR_Y', checked: false },
-      { key: 'PANSTARRS_i', label: 'PANSTARRS_i', checked: false },
-    ])
-    setWiseFilters([
-      { key: '1', label: '1', checked: false },
-      { key: '2', label: '2', checked: false },
-      { key: '3', label: '3', checked: false },
-      { key: '4', label: '4', checked: false },
-    ])
+    setTelescopes(initialTelescopes)
+    setTwoMassFilters(initialTwoMassFilters)
+    setDesiFilters(initialDesiFilters)
+    setEuclidFilters(initialEuclidFilters)
+    setWiseFilters(initialWiseFilters)
   }
 
   return (
@@ -688,7 +563,7 @@ const AstroImageViewer: React.FC = () => {
       </Card>
 
       {/* 测试窗口移到此处 */}
-      <Card title="测试窗口（模拟server.cjs输出）" style={{ marginTop: 16 }}>
+      <Card title="测试窗口" style={{ marginTop: 16 }}>
         <pre className={style.testWindowPre}>
           {testLog ? JSON.stringify(testLog, null, 2) : '暂无数据'}
         </pre>
