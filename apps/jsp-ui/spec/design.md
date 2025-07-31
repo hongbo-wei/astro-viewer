@@ -100,38 +100,54 @@ Astro Visualizer - JSP UI 是一个基于 React、TypeScript 和 Vite 的天文�
 ### 5.1 API 接口设计
 
 #### 5.1.1 获取天区数据
-- **URL**：`GET /api/sky-region`
-- **参数**：
-  - `ra` (float): 赤经中心
-  - `dec` (float): 赤纬中心
-  - `radius` (float): 视场半径
-- **响应**：
-  ```json
-  {
-    "stars": [{ "id": "string", "ra": float, "dec": float, "mag": float, ... }],
-    "constellations": [...],
-    "meta": {...}
-  }
-  ```
+**URL**：`POST localhost:3001/api/log`
+**参数**：
+  - `telescopesAndFilters` (array): 望远镜及其滤镜/波段配置
+    - `telescope` (string): 望远镜名称
+    - `db` (string): 数据库名称
+    - `column` (string): 滤镜/波段所在列名
+    - `filters` (array): 滤镜/波段列表
+  - `coordinations` (array): 选区坐标点（ra/dec）
+    - `ra` (float): 赤经
+    - `dec` (float): 赤纬
 
-#### 5.1.2 执行 JSP 投影
-- **URL**：`POST /api/jsp`
-- **参数**：
-  ```json
-  {
-    "region": { "ra": float, "dec": float, "radius": float },
-    "projection": "string",
-    "options": { ... }
-  }
-  ```
-- **响应**：
-  ```json
-  {
-    "imageUrl": "string",
-    "wcs": { ... },
-    "meta": { ... }
-  }
-  ```
+详细参数示例：
+```json
+{
+  "telescopesAndFilters": [
+    {
+      "telescope": "2MASS",
+      "db": "twomass_allsky_images",
+      "column": "filter",
+      "filters": ["h"]
+    },
+    {
+      "telescope": "DESI",
+      "db": "survey_bricks_dr10_south_external",
+      "column": "band",
+      "filters": ["W1"]
+    },
+    {
+      "telescope": "Euclid",
+      "db": "sedm_mosaic_product",
+      "column": "filter_name",
+      "filters": ["DECAM_g", "MEGACAM_r"]
+    },
+    {
+      "telescope": "WISE",
+      "db": "wise_wise_allwise_p3am_cdd",
+      "column": "band",
+      "filters": ["1"]
+    }
+  ],
+  "coordinations": [
+    { "ra": 16.763091504406475, "dec": 31.238707489166874 },
+    { "ra": 18.763091504406475, "dec": 30.481618203879762 },
+    { "ra": 18.763091504406475, "dec": 30.238707489166874 },
+    { "ra": 16.607310030651888, "dec": 30.238707489166874 }
+  ]
+}
+```
 
 #### 5.1.3 获取图像详情
 - **URL**：`GET /api/image/:id`

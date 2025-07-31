@@ -27,3 +27,4 @@ public/.DS_Store
 *.njsproj
 *.sln
 *.sw?
+moc/
