@@ -14,6 +14,7 @@ dist-ssr
 
 # .env
 # env
+venv/
 
 # Editor directories and files
 .vscode/*
@@ -27,4 +28,7 @@ public/.DS_Store
 *.njsproj
 *.sln
 *.sw?
-moc/
+
+public/moc/
+public/moc_json/
+!public/moc_json/moc_manifest.json

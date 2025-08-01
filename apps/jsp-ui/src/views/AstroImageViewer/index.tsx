@@ -4,6 +4,7 @@ import React, { useState, useRef } from 'react'
 
 import CelestialSphere from '@/components/CelestialSphere'
 import { getRaDecByRaycast, pixelToRaDec } from '@/utils/raycastUtils'
+import MOC, { MOCData } from '@/components/MOC';
 
 
 import {
@@ -187,6 +188,8 @@ const AstroImageViewer: React.FC = () => {
     setWiseFilters(initialWiseFilters)
   }
 
+  const [mocs, setMOCs] = useState<MOCData[]>([]);
+
   return (
     <div className={style.astroViewer}>
       <Title level={2} className={style.title}>
@@ -357,13 +360,15 @@ const AstroImageViewer: React.FC = () => {
                 onMouseUp={handleMouseUp}
                 style={{ cursor: isSelectionMode ? 'crosshair' : 'default' }}
               >
+                <MOC onMOCsLoaded={setMOCs} />
                 <CelestialSphere
                   ref={celestialRef}
                   selectedTelescopes={telescopes
                     .filter((t) => t.selected)
                     .map((t) => t.key)}
                   onRaycast={handleRaycast}
-                  showCoordinates={false} // 不再由 CelestialSphere 内部显示悬浮坐标
+                  showCoordinates={false}
+                  mocs={mocs}
                 />
                 {/* 悬浮坐标框，单行自适应宽度，风格与 CelestialSphere 内部一致 */}
                 {hoverRaDec && (

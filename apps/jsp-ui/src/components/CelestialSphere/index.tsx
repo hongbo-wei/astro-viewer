@@ -7,9 +7,11 @@ import { TELESCOPE_RANGES } from '../../data/telescopeRanges'
 
 import styles from './index.module.scss'
 
+import type { MOCData } from '../MOC';
+
 interface CelestialSphereProps {
   className?: string
-  enableRotation?: boolean // New prop to control rotation
+  enableRotation?: boolean // 是否允许旋转
   selectedTelescopes?: string[] // 选中的望远镜列表
   onRaycast?: (
     intersectionPoint: THREE.Vector3 | null,
@@ -17,6 +19,7 @@ interface CelestialSphereProps {
   ) => void // 3D射线投射回调，返回球面坐标用于RA/Dec转换
   showCoordinates?: boolean // 是否显示坐标信息
   currentCoordinates?: { ra: number; dec: number } | null // 当前坐标信息
+  mocs?: MOCData[] // 新增：MOC 区域数据
 }
 
 // 望远镜颜色配置
@@ -34,7 +37,83 @@ const CelestialSphere = forwardRef<any, CelestialSphereProps>(({
   showCoordinates = false,
   currentCoordinates = null,
   enableRotation = true, // 默认允许旋转
+  mocs = [], // 新增
 }, ref) => {
+  // --- MOC 区域渲染 ---
+  // HEALPix 工具函数：给定 nside, ipix，返回球面四角顶点（单位球，theta/phi）
+  function healpixCellVertices(nside: number, ipix: number) {
+    // 这里只做简单近似，真实 HEALPix 需用 healpy/JS 实现更精确
+    // 这里只取 cell 中心点，实际可用 JS healpix 库替换
+    // 返回 [theta, phi] 数组（弧度）
+    // 这里只做演示，实际建议用 healpix.js 或 mocpy-js
+    // 这里只画点而非面，后续可扩展
+    // 伪代码：返回 cell 中心点
+    const npix = 12 * nside * nside;
+    const f = ipix / npix;
+    const theta = Math.acos(1 - 2 * f); // 0~pi
+    const phi = 2 * Math.PI * f; // 0~2pi
+    return [[theta, phi]];
+  }
+
+  // MOC 区域渲染
+  useEffect(() => {
+    if (!sceneRef.current) return;
+    // 先移除旧的 MOC group
+    const old = sceneRef.current.getObjectByName('mocGroup');
+    if (old) sceneRef.current.remove(old);
+    if (!mocs || mocs.length === 0) return;
+    const group = new THREE.Group();
+    group.name = 'mocGroup';
+    mocs.forEach((moc) => {
+      // 假设 moc.data 有 order 和 ranges 字段（mocpy 默认格式）
+      const order = moc.data.order || moc.data.norder || 8;
+      const ranges = moc.data.ranges || moc.data.uniq || [];
+      const nside = Math.pow(2, order);
+      // 展开所有 cell
+      let ipixList: number[] = [];
+      if (Array.isArray(ranges[0])) {
+        // ranges: [[start, end], ...]
+        ranges.forEach(([start, end]: [number, number]) => {
+          for (let i = start; i < end; ++i) ipixList.push(i);
+        });
+      } else {
+        // uniq: [ipix, ...]
+        ipixList = ranges;
+      }
+      // 只画部分点，避免太多
+      ipixList.slice(0, 200).forEach((ipix) => {
+        const verts = healpixCellVertices(nside, ipix);
+        verts.forEach(([theta, phi]) => {
+          if (typeof theta === 'number' && typeof phi === 'number') {
+            // 球面转笛卡尔
+            const r = 1.001; // 稍大于球体，避免z-fighting
+            const x = r * Math.sin(theta) * Math.cos(phi);
+            const y = r * Math.sin(theta) * Math.sin(phi);
+            const z = r * Math.cos(theta);
+            // 生成灰度色，模拟DS9效果
+            // 方案1：用ipix的hash做灰度
+            const gray = 32 + (ipix * 97 % 192); // 32~223
+            const color = (gray << 16) | (gray << 8) | gray;
+            const geom = new THREE.SphereGeometry(0.004, 6, 6);
+            const mat = new THREE.MeshBasicMaterial({
+              color,
+              transparent: false,
+              opacity: 1.0,
+              depthWrite: false,
+            });
+            const mesh = new THREE.Mesh(geom, mat);
+            mesh.position.set(x, y, z);
+            group.add(mesh);
+          }
+        });
+      });
+    });
+    sceneRef.current.add(group);
+    // 清理函数
+    return () => {
+      if (sceneRef.current) sceneRef.current.remove(group);
+    };
+  }, [mocs]);
   const mountRef = useRef<HTMLDivElement>(null)
   const sceneRef = useRef<THREE.Scene | null>(null)
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null)
