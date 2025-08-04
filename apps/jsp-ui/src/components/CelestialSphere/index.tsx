@@ -7,7 +7,9 @@ import { TELESCOPE_RANGES } from '../../data/telescopeRanges'
 
 import styles from './index.module.scss'
 
+
 import type { MOCData } from '../MOC';
+import { vertices as healpixVertices } from 'healpix'; // healpix.js: vertices(nside, ipix) 返回 [[theta, phi], ...]
 
 interface CelestialSphereProps {
   className?: string
@@ -41,18 +43,15 @@ const CelestialSphere = forwardRef<any, CelestialSphereProps>(({
 }, ref) => {
   // --- MOC 区域渲染 ---
   // HEALPix 工具函数：给定 nside, ipix，返回球面四角顶点（单位球，theta/phi）
-  function healpixCellVertices(nside: number, ipix: number) {
-    // 这里只做简单近似，真实 HEALPix 需用 healpy/JS 实现更精确
-    // 这里只取 cell 中心点，实际可用 JS healpix 库替换
-    // 返回 [theta, phi] 数组（弧度）
-    // 这里只做演示，实际建议用 healpix.js 或 mocpy-js
-    // 这里只画点而非面，后续可扩展
-    // 伪代码：返回 cell 中心点
-    const npix = 12 * nside * nside;
-    const f = ipix / npix;
-    const theta = Math.acos(1 - 2 * f); // 0~pi
-    const phi = 2 * Math.PI * f; // 0~2pi
-    return [[theta, phi]];
+  // 使用 healpix.js 获取真实多边形顶点
+  function healpixCellPolygon(nside: number, ipix: number): [number, number][] {
+    // healpix.js: vertices(nside, ipix) 返回 [[theta, phi], ...]，单位弧度
+    // 若异常则返回空数组
+    try {
+      return healpixVertices(nside, ipix);
+    } catch {
+      return [];
+    }
   }
 
   // MOC 区域渲染
@@ -80,32 +79,67 @@ const CelestialSphere = forwardRef<any, CelestialSphereProps>(({
         // uniq: [ipix, ...]
         ipixList = ranges;
       }
-      // 只画部分点，避免太多
+      // 只画部分cell，避免太多
       ipixList.slice(0, 200).forEach((ipix) => {
-        const verts = healpixCellVertices(nside, ipix);
-        verts.forEach(([theta, phi]) => {
-          if (typeof theta === 'number' && typeof phi === 'number') {
-            // 球面转笛卡尔
-            const r = 1.001; // 稍大于球体，避免z-fighting
-            const x = r * Math.sin(theta) * Math.cos(phi);
-            const y = r * Math.sin(theta) * Math.sin(phi);
-            const z = r * Math.cos(theta);
-            // 生成灰度色，模拟DS9效果
-            // 方案1：用ipix的hash做灰度
-            const gray = 32 + (ipix * 97 % 192); // 32~223
-            const color = (gray << 16) | (gray << 8) | gray;
-            const geom = new THREE.SphereGeometry(0.004, 6, 6);
-            const mat = new THREE.MeshBasicMaterial({
-              color,
-              transparent: false,
-              opacity: 1.0,
-              depthWrite: false,
-            });
-            const mesh = new THREE.Mesh(geom, mat);
-            mesh.position.set(x, y, z);
-            group.add(mesh);
-          }
+        const poly = healpixCellPolygon(nside, ipix);
+        if (poly.length < 3) return; // 至少3点
+        // 球面坐标转笛卡尔
+        const vertices: THREE.Vector3[] = poly.map(([theta, phi]) => {
+          const r = 1.001;
+          const x = r * Math.sin(theta) * Math.cos(phi);
+          const y = r * Math.sin(theta) * Math.sin(phi);
+          const z = r * Math.cos(theta);
+          return new THREE.Vector3(x, y, z);
         });
+        // 生成灰度色，模拟DS9效果
+        const gray = 32 + (ipix * 97 % 192); // 32~223
+        const color = (gray << 16) | (gray << 8) | gray;
+        // 构建多边形面片
+        const shape = new THREE.Shape();
+        vertices.forEach((v, i) => {
+          if (i === 0) shape.moveTo(v.x, v.y);
+          else shape.lineTo(v.x, v.y);
+        });
+        shape.lineTo(vertices[0].x, vertices[0].y); // 闭合
+        // 投影到球面，直接用三角面片
+        // 由于ShapeGeometry是2D的，这里用BufferGeometry手动构建面
+        const geom = new THREE.BufferGeometry();
+        const posArr = new Float32Array(vertices.length * 3);
+        vertices.forEach((v, i) => {
+          posArr[i * 3] = v.x;
+          posArr[i * 3 + 1] = v.y;
+          posArr[i * 3 + 2] = v.z;
+        });
+        // 以中心点为扇形三角化
+        const center = new THREE.Vector3(
+          vertices.reduce((a, v) => a + v.x, 0) / vertices.length,
+          vertices.reduce((a, v) => a + v.y, 0) / vertices.length,
+          vertices.reduce((a, v) => a + v.z, 0) / vertices.length
+        );
+        const allVerts = [center, ...vertices];
+        const allPosArr = new Float32Array((vertices.length + 1) * 3);
+        allVerts.forEach((v, i) => {
+          allPosArr[i * 3] = v.x;
+          allPosArr[i * 3 + 1] = v.y;
+          allPosArr[i * 3 + 2] = v.z;
+        });
+        // 三角面索引
+        const indices: number[] = [];
+        for (let i = 1; i <= vertices.length; ++i) {
+          indices.push(0, i, i === vertices.length ? 1 : i + 1);
+        }
+        geom.setAttribute('position', new THREE.BufferAttribute(allPosArr, 3));
+        geom.setIndex(indices);
+        geom.computeVertexNormals();
+        const mat = new THREE.MeshBasicMaterial({
+          color,
+          transparent: false,
+          opacity: 1.0,
+          depthWrite: false,
+          side: THREE.DoubleSide,
+        });
+        const mesh = new THREE.Mesh(geom, mat);
+        group.add(mesh);
       });
     });
     sceneRef.current.add(group);

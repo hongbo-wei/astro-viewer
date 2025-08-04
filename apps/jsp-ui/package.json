@@ -27,6 +27,7 @@
     "dotenv": "^16.4.5",
     "elkjs": "^0.9.3",
     "express": "^5.1.0",
+    "healpix": "^1.0.0",
     "i18next": "^23.10.1",
     "i18next-browser-languagedetector": "^7.2.0",
     "lodash-es": "^4.17.21",

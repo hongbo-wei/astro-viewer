@@ -14,5 +14,9 @@ for filename in os.listdir(fits_dir):
         print(f'Converting {fits_path} -> {json_path}')
         moc = MOC.from_fits(fits_path)
         moc_dict = moc.serialize(format='json')
+        output = [
+        {"order": int(order), "cells": cells}
+        for order, cells in sorted(moc_dict.items(), key=lambda x: int(x[0]))
+        ]
         with open(json_path, 'w') as f:
-            json.dump(moc_dict, f)
+            json.dump(output, f)
