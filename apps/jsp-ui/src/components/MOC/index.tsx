@@ -44,7 +44,7 @@ const MOCs: React.FC<MOCsProps> = ({ mocDir = 'moc_json', onMOCsLoaded }) => {
       });
   }, [mocDir, onMOCsLoaded]);
 
-  if (loading) return <div>Loading MOCs...</div>;
+  if (loading) return null;
   if (error) return <div>Error loading MOCs: {error}</div>;
   return null; // 此组件只负责加载并传递数据
 };
