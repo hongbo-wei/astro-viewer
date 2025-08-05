@@ -8,6 +8,7 @@
 .alertInfo {
   margin: 8px 0;
 }
+
 .alertWarning {
   margin: 8px 0;
 }
@@ -19,6 +20,7 @@
   background: #f6f6f6;
   font-size: 13px;
 }
+
 // 悬浮坐标框样式
 .hoverRaDecBox {
   position: absolute;
@@ -31,7 +33,7 @@
   border-radius: 6px;
   font-size: 14px;
   font-family: Menlo, Monaco, Consolas, monospace;
-  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.18);
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.18);
   white-space: nowrap;
   min-width: 220px;
   max-width: 320px;
@@ -40,9 +42,11 @@
   line-height: 1.6;
   user-select: none;
 }
+
 .hoverRaDecBox .ra {
   color: #ffd666;
 }
+
 .hoverRaDecBox .dec {
   color: #91d5ff;
 }
@@ -58,11 +62,13 @@
 
   * {
     box-sizing: border-box;
-  }  .title {
+  }
+
+  .title {
     text-align: center;
     margin-top: 0;
     margin-bottom: 0;
-    color: #ffffff;
+    color: #fff;
     background: #1890ff !important;
     padding: 8px;
     border-radius: 0;
@@ -90,8 +96,7 @@
     width: 220px;
     min-height: 100%;
     max-height: calc(100vh - 120px); /* 限制最大高度 */
-    overflow-y: auto; /* 添加垂直滚动 */
-    overflow-x: hidden; /* 隐藏水平滚动 */
+    overflow: hidden auto; /* 添加垂直滚动 */ /* 隐藏水平滚动 */
 
     /* 美化滚动条 */
     &::-webkit-scrollbar {
@@ -251,10 +256,7 @@
           .selectionOverlay {
             // pointer-events: none;
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            inset: 0;
             background: rgba(0, 0, 0, 0.3);
             display: flex;
             align-items: center;
@@ -302,10 +304,7 @@
         &::before {
           content: '';
           position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
+          inset: 0;
           background: radial-gradient(
               circle at 20% 30%,
               rgba(255, 255, 0, 0.3) 2px,
@@ -343,10 +342,7 @@
         &::after {
           content: '';
           position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
+          inset: 0;
           background: radial-gradient(
               ellipse at 70% 30%,
               rgba(255, 255, 0, 0.1) 0%,
@@ -425,7 +421,7 @@
 .mobileLeftSider {
   display: none; // Hidden on desktop
 
-  @media (max-width: 768px) {
+  @media (width <= 768px) {
     display: block !important; // Show on mobile
     width: 100%;
     background: white;
@@ -473,7 +469,7 @@
 .mobileRightSider {
   display: none; // Hidden on desktop
 
-  @media (max-width: 768px) {
+  @media (width <= 768px) {
     display: block !important; // Show on mobile
     width: 100%;
     background: white;
@@ -545,7 +541,7 @@
 }
 
 // Responsive design
-@media (max-width: 1400px) {
+@media (width <= 1400px) {
   .astroViewer {
     .leftSider {
       width: 200px !important;
@@ -563,7 +559,7 @@
   }
 }
 
-@media (max-width: 1200px) {
+@media (width <= 1200px) {
   .astroViewer {
     .leftSider {
       width: 200px !important;
@@ -596,7 +592,7 @@
   }
 }
 
-@media (max-width: 992px) {
+@media (width <= 992px) {
   .astroViewer {
     .mainLayout {
       .leftSider,
@@ -627,7 +623,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .astroViewer {
     padding: 0;
 
@@ -688,7 +684,7 @@
   }
 }
 
-@media (max-width: 576px) {
+@media (width <= 576px) {
   .astroViewer {
     padding: 0;
 
@@ -724,7 +720,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .astroViewer {
     .mainLayout {
       min-height: 50vh; // Slightly smaller on very small screens
@@ -762,7 +758,7 @@
 }
 
 // Additional styles for portrait orientation on mobile
-@media (max-width: 768px) and (orientation: portrait) {
+@media (width <= 768px) and (orientation: portrait) {
   .astroViewer {
     .mainLayout {
       min-height: 50vh;
@@ -776,14 +772,14 @@
 }
 
 // Additional styles for landscape orientation on mobile
-@media (max-width: 768px) and (orientation: landscape) {
+@media (width <= 768px) and (orientation: landscape) {
   .astroViewer {
     .mainLayout {
       min-height: 70vh;
 
       .mainContent {
         max-height: 85vh; // Increased height for landscape mobile
-        min-height: 70vh; // Ensure minimum height 
+        min-height: 70vh; // Ensure minimum height
         aspect-ratio: 16 / 9; // Cinematic for landscape
       }
     }
@@ -791,7 +787,7 @@
 }
 
 // Responsive layout for vertical screens
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .astroViewer {
     display: flex;
     flex-direction: column;

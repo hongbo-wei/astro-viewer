@@ -1,4 +1,4 @@
-# Astro Visualizer - JSP UI
+# Astro Viewer - JSP UI
 
 这是 Astro Visualizer 项目的前端子项目，基于 React、TypeScript 和 Vite 构建，旨在提供天文数据的可视化界面。
 
@@ -47,16 +47,17 @@ pnpm run dev
 打开浏览器访问 [http://localhost:5173](http://localhost:5173)（端口号以实际输出为准）。
 
 ## 主要依赖
+
 - React
 - TypeScript
 - Vite
 - Three.js（用于三维可视化）
 
 ## 项目脚本
+
 - `npm run dev` 启动开发服务器
 - `npm run build` 打包生产环境代码
 - `npm run preview` 预览打包后的应用
-
 
 ## 系统架构图
 
@@ -82,9 +83,11 @@ flowchart LR
 > 该流程实现了多望远镜、多波段天文数据的联合可视化与分析。
 
 ## 相关文档
+
 - `docs/WCS_UPGRADE_GUIDE.md`：WCS 升级指南
 
 ## 贡献
+
 欢迎提交 issue 和 PR 参与项目建设。
 
 ---

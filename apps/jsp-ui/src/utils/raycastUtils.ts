@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+
 import { createSphereCoordinates } from './coordinateUtils'
 
 /**
@@ -15,7 +16,7 @@ export function getRaDecByRaycast(
   y: number,
   containerRect: DOMRect,
   camera: THREE.PerspectiveCamera,
-  sphere: THREE.Mesh
+  sphere: THREE.Mesh,
 ): { ra: number; dec: number } | null {
   // 将像素坐标标准化到-1到1
   const mouse = new THREE.Vector2()
@@ -31,7 +32,11 @@ export function getRaDecByRaycast(
   if (intersects.length > 0 && intersects[0]) {
     const intersectionPoint = intersects[0].point
     const sphereCoords = createSphereCoordinates(intersectionPoint)
-    if (sphereCoords && typeof sphereCoords.ra === 'number' && typeof sphereCoords.dec === 'number') {
+    if (
+      sphereCoords &&
+      typeof sphereCoords.ra === 'number' &&
+      typeof sphereCoords.dec === 'number'
+    ) {
       return { ra: sphereCoords.ra, dec: sphereCoords.dec }
     }
   }
@@ -52,9 +57,9 @@ export function pixelToRaDec(
   y: number,
   containerRef: React.RefObject<HTMLElement>,
   camera: THREE.PerspectiveCamera,
-  sphere: THREE.Mesh
+  sphere: THREE.Mesh,
 ): { ra: number; dec: number } | null {
-  if (!containerRef.current) return null;
-  const rect = containerRef.current.getBoundingClientRect();
-  return getRaDecByRaycast(x, y, rect, camera, sphere);
+  if (!containerRef.current) return null
+  const rect = containerRef.current.getBoundingClientRect()
+  return getRaDecByRaycast(x, y, rect, camera, sphere)
 }

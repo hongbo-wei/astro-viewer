@@ -3,16 +3,8 @@ import { Card, Button, Checkbox, List, Typography, Row, Col, Alert } from 'antd'
 import React, { useState, useRef } from 'react'
 
 import CelestialSphere from '@/components/CelestialSphere'
-import { getRaDecByRaycast, pixelToRaDec } from '@/utils/raycastUtils'
-import MOC, { MOCData } from '@/components/MOC';
-
-
-import {
-  FilterOption,
-  TelescopeOption,
-  RetrievedItem,
-  RetrievedImage,
-} from '@/types/astro'
+import MOC, { MOCData } from '@/components/MOC'
+import SelectionBox from '@/components/SelectionBox'
 import {
   initialTelescopes,
   initialTwoMassFilters,
@@ -20,10 +12,17 @@ import {
   initialEuclidFilters,
   initialWiseFilters,
 } from '@/constants/telescopeOptions'
+import {
+  FilterOption,
+  TelescopeOption,
+  RetrievedItem,
+  RetrievedImage,
+} from '@/types/astro'
 import { prepareRetrievePayload } from '@/utils/payloadUtils'
+import { getRaDecByRaycast, pixelToRaDec } from '@/utils/raycastUtils'
 
 import style from './index.module.scss'
-import SelectionBox from '@/components/SelectionBox'
+
 const { Title, Text } = Typography
 
 const AstroImageViewer: React.FC = () => {
@@ -35,23 +34,37 @@ const AstroImageViewer: React.FC = () => {
   const JSP_IMAGE_PATH = '/dummy-jsp-image.png' // Place the provided image in public/ as dummy-jsp-image.png
   // Placeholder for the real JSP image path from the server
   // const [jspImagePath, setJspImagePath] = useState<string>('');
-  
+
   const mainImageRef = useRef<HTMLDivElement>(null)
   const celestialRef = useRef<any>(null)
   // 已移除 worldPosition 变量（未被使用）
   const [isSelectionMode, setIsSelectionMode] = useState(false)
-  const [lastSelectionCorners, setLastSelectionCorners] = useState<Array<{ ra: number; dec: number }>>([])
-  const [selectionStart, setSelectionStart] = useState<{ x: number; y: number } | null>(null)
-  const [currentSelection, setCurrentSelection] = useState<{ x: number; y: number } | null>(null)
+  const [lastSelectionCorners, setLastSelectionCorners] = useState<
+    Array<{ ra: number; dec: number }>
+  >([])
+  const [selectionStart, setSelectionStart] = useState<{
+    x: number
+    y: number
+  } | null>(null)
+  const [currentSelection, setCurrentSelection] = useState<{
+    x: number
+    y: number
+  } | null>(null)
 
   // Telescope selection state - sorted alphabetically by ASCII
-  const [telescopes, setTelescopes] = useState<TelescopeOption[]>(initialTelescopes)
+  const [telescopes, setTelescopes] =
+    useState<TelescopeOption[]>(initialTelescopes)
 
   // Updated filter data to match specifications - sorted alphabetically by ASCII
-  const [euclidFilters, setEuclidFilters] = useState<FilterOption[]>(initialEuclidFilters)
-  const [wiseFilters, setWiseFilters] = useState<FilterOption[]>(initialWiseFilters)
-  const [twoMassFilters, setTwoMassFilters] = useState<FilterOption[]>(initialTwoMassFilters)
-  const [desiFilters, setDesiFilters] = useState<FilterOption[]>(initialDesiFilters)
+  const [euclidFilters, setEuclidFilters] =
+    useState<FilterOption[]>(initialEuclidFilters)
+  const [wiseFilters, setWiseFilters] =
+    useState<FilterOption[]>(initialWiseFilters)
+  const [twoMassFilters, setTwoMassFilters] = useState<FilterOption[]>(
+    initialTwoMassFilters,
+  )
+  const [desiFilters, setDesiFilters] =
+    useState<FilterOption[]>(initialDesiFilters)
 
   const [retrievedData] = useState<RetrievedItem[]>([
     { id: '1', name: 'Item 1' },
@@ -105,14 +118,28 @@ const AstroImageViewer: React.FC = () => {
   }
 
   // 鼠标移动时，统一用 pixelToRaDec 计算 RA/Dec，基准以 mainImageRef 为准
-  const [hoverRaDec, setHoverRaDec] = useState<{ ra: number; dec: number } | null>(null)
+  const [hoverRaDec, setHoverRaDec] = useState<{
+    ra: number
+    dec: number
+  } | null>(null)
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (mainImageRef.current && celestialRef.current && celestialRef.current.getCamera && celestialRef.current.getSphere) {
+    if (
+      mainImageRef.current &&
+      celestialRef.current &&
+      celestialRef.current.getCamera &&
+      celestialRef.current.getSphere
+    ) {
       const rect = mainImageRef.current.getBoundingClientRect()
       const x = event.clientX - rect.left
       const y = event.clientY - rect.top
       // 悬浮坐标
-      const raDec = pixelToRaDec(x, y, mainImageRef, celestialRef.current.getCamera(), celestialRef.current.getSphere())
+      const raDec = pixelToRaDec(
+        x,
+        y,
+        mainImageRef,
+        celestialRef.current.getCamera(),
+        celestialRef.current.getSphere(),
+      )
       setHoverRaDec(raDec)
       // SelectionBox 框选实时更新
       if (isSelectionMode && selectionStart) {
@@ -151,7 +178,7 @@ const AstroImageViewer: React.FC = () => {
         desiFilters,
         euclidFilters,
         wiseFilters,
-        lastSelectionCorners
+        lastSelectionCorners,
       )
       setTestLog(payload)
       fetch('http://localhost:3001/api/log', {
@@ -188,7 +215,7 @@ const AstroImageViewer: React.FC = () => {
     setWiseFilters(initialWiseFilters)
   }
 
-  const [mocs, setMOCs] = useState<MOCData[]>([]);
+  const [mocs, setMOCs] = useState<MOCData[]>([])
 
   return (
     <div className={style.astroViewer}>
@@ -198,10 +225,7 @@ const AstroImageViewer: React.FC = () => {
       <div className={style.mainLayout}>
         {/* Left Sidebar */}
         <div className={style.leftSider}>
-          <Card
-            title="Telescopes & Filters"
-            className={style.telescopeCard}
-          >
+          <Card title="Telescopes & Filters" className={style.telescopeCard}>
             {/* 重置按钮放在标题下方、选项上方 */}
             <Button
               size="small"
@@ -373,36 +397,48 @@ const AstroImageViewer: React.FC = () => {
                 {/* 悬浮坐标框，单行自适应宽度，风格与 CelestialSphere 内部一致 */}
                 {hoverRaDec && (
                   <div className={style.hoverRaDecBox}>
-                    RA: <span className="ra">{hoverRaDec.ra.toFixed(3)}°</span> &nbsp;|&nbsp; Dec: <span className="dec">{hoverRaDec.dec.toFixed(3)}°</span>
+                    RA: <span className="ra">{hoverRaDec.ra.toFixed(3)}°</span>{' '}
+                    &nbsp;|&nbsp; Dec:{' '}
+                    <span className="dec">{hoverRaDec.dec.toFixed(3)}°</span>
                   </div>
                 )}
                 {/* ...existing code... */}
                 {/* Selection rectangle overlay */}
-                {isSelectionMode && selectionStart && currentSelection && mainImageRef.current && celestialRef.current && celestialRef.current.getCamera() && celestialRef.current.getSphere() && (
-                  <SelectionBox
-                    start={selectionStart}
-                    end={currentSelection}
-                    className={style.selectionRectangle}
-                    containerRect={mainImageRef.current.getBoundingClientRect()}
-                    getRaDecByRaycast={getRaDecByRaycast}
-                    camera={celestialRef.current.getCamera()}
-                    sphere={celestialRef.current.getSphere()}
-                    raLimit={RA_LIMIT}
-                    decLimit={DEC_LIMIT}
-                    onChange={(corners, warning) => {
-                      setPreviewData(
-                        corners.map((c) => `RA: ${c.ra.toFixed(6)}°, Dec: ${c.dec.toFixed(6)}°`)
-                      )
-                      setLastSelectionCorners(corners) // 存储原始高精度数据
-                      setSelectionWarning(warning)
-                    }}
-                  />
-                )}
+                {isSelectionMode &&
+                  selectionStart &&
+                  currentSelection &&
+                  mainImageRef.current &&
+                  celestialRef.current &&
+                  celestialRef.current.getCamera() &&
+                  celestialRef.current.getSphere() && (
+                    <SelectionBox
+                      start={selectionStart}
+                      end={currentSelection}
+                      className={style.selectionRectangle}
+                      containerRect={mainImageRef.current.getBoundingClientRect()}
+                      getRaDecByRaycast={getRaDecByRaycast}
+                      camera={celestialRef.current.getCamera()}
+                      sphere={celestialRef.current.getSphere()}
+                      raLimit={RA_LIMIT}
+                      decLimit={DEC_LIMIT}
+                      onChange={(corners, warning) => {
+                        setPreviewData(
+                          corners.map(
+                            (c) =>
+                              `RA: ${c.ra.toFixed(6)}°, Dec: ${c.dec.toFixed(6)}°`,
+                          ),
+                        )
+                        setLastSelectionCorners(corners) // 存储原始高精度数据
+                        setSelectionWarning(warning)
+                      }}
+                    />
+                  )}
                 {/* Selection mode overlay */}
                 {isSelectionMode && (
                   <div className={style.selectionOverlay}>
                     <div className={style.selectionInstructions}>
-                      框选区域以选取天区<br />
+                      框选区域以选取天区
+                      <br />
                       按住鼠标左键拖动，释放后即取回坐标及图像
                     </div>
                   </div>
@@ -426,28 +462,42 @@ const AstroImageViewer: React.FC = () => {
               size="small"
               dataSource={previewData}
               renderItem={(item, idx) => {
-                let ra = '', dec = '';
-                const match = item.match(/RA[:\s]*([\d.\-]+)[^\d]+Dec[:\s]*([\d.\-]+)/i);
+                let ra = '',
+                  dec = ''
+                const match = item.match(
+                  /RA[:\s]*([\d.-]+)[^\d]+Dec[:\s]*([\d.-]+)/i,
+                )
                 if (match) {
-                  ra = match[1] ?? '';
-                  dec = match[2] ?? '';
+                  ra = match[1] ?? ''
+                  dec = match[2] ?? ''
                 }
                 return (
                   <div key={idx}>
                     <div className={style.coordinationText}>RA: {ra}°</div>
                     <div className={style.coordinationText}>Dec: {dec}°</div>
-                    {idx !== previewData.length - 1 && <hr style={{ margin: '6px 0', border: 0, borderTop: '1px solid #eee' }} />}
+                    {idx !== previewData.length - 1 && (
+                      <hr
+                        style={{
+                          margin: '6px 0',
+                          border: 0,
+                          borderTop: '1px solid #eee',
+                        }}
+                      />
+                    )}
                   </div>
-                );
+                )
               }}
             />
             {isSelectionMode && (
               <Alert
                 message={
                   <>
-                    选区最大范围：<br />
-                    RA≤2°<br />
-                    Dec≤1°<br />
+                    选区最大范围：
+                    <br />
+                    RA≤2°
+                    <br />
+                    Dec≤1°
+                    <br />
                     超出将自动截断
                   </>
                 }
@@ -468,67 +518,81 @@ const AstroImageViewer: React.FC = () => {
         </div>
       </div>
       {/* JSP Images Gallery */}
-      <Card title="JSP Images" className={style.imagesGallery} style={{ marginBottom: 16 }}>
+      <Card
+        title="JSP Images"
+        className={style.imagesGallery}
+        style={{ marginBottom: 16 }}
+      >
         {showJspImage ? (
           <div style={{ textAlign: 'center', padding: '16px 0' }}>
             <img
               src={JSP_IMAGE_PATH}
               alt="JSP Dummy"
-              style={{ maxWidth: '100%', maxHeight: 600, borderRadius: 8, boxShadow: '0 2px 8px #eee', cursor: 'pointer' }}
+              style={{
+                maxWidth: '100%',
+                maxHeight: 600,
+                borderRadius: 8,
+                boxShadow: '0 2px 8px #eee',
+                cursor: 'pointer',
+              }}
               onClick={() => setJspModalVisible(true)}
             />
             <div style={{ marginTop: 8, color: '#888' }}>点击图片全屏显示</div>
           </div>
         ) : (
-          <div style={{ color: '#aaa', textAlign: 'center', padding: '24px 0' }}>
+          <div
+            style={{ color: '#aaa', textAlign: 'center', padding: '24px 0' }}
+          >
             JSP images will be displayed here.
           </div>
         )}
 
-      {/* Fullscreen JSP image modal */}
-      {jspModalVisible && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            background: 'rgba(0,0,0,0.95)',
-            zIndex: 9999,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-          onClick={() => setJspModalVisible(false)}
-        >
-          <img
-            src={JSP_IMAGE_PATH}
-            alt="JSP Dummy Fullscreen"
+        {/* Fullscreen JSP image modal */}
+        {jspModalVisible && (
+          <div
             style={{
-              maxWidth: '95vw',
-              maxHeight: '95vh',
-              borderRadius: 12,
-              boxShadow: '0 4px 32px #222',
-              background: '#111',
-            }}
-          />
-          <span
-            style={{
-              position: 'absolute',
-              top: 24,
-              right: 36,
-              color: '#fff',
-              fontSize: 32,
-              fontWeight: 700,
-              cursor: 'pointer',
-              zIndex: 10000,
-              textShadow: '0 2px 8px #000',
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100vw',
+              height: '100vh',
+              background: 'rgba(0,0,0,0.95)',
+              zIndex: 9999,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
             onClick={() => setJspModalVisible(false)}
-          >×</span>
-        </div>
-      )}
+          >
+            <img
+              src={JSP_IMAGE_PATH}
+              alt="JSP Dummy Fullscreen"
+              style={{
+                maxWidth: '95vw',
+                maxHeight: '95vh',
+                borderRadius: 12,
+                boxShadow: '0 4px 32px #222',
+                background: '#111',
+              }}
+            />
+            <span
+              style={{
+                position: 'absolute',
+                top: 24,
+                right: 36,
+                color: '#fff',
+                fontSize: 32,
+                fontWeight: 700,
+                cursor: 'pointer',
+                zIndex: 10000,
+                textShadow: '0 2px 8px #000',
+              }}
+              onClick={() => setJspModalVisible(false)}
+            >
+              ×
+            </span>
+          </div>
+        )}
       </Card>
 
       {/* Bottom Retrieved Images Gallery */}
@@ -557,7 +621,11 @@ const AstroImageViewer: React.FC = () => {
       </Card>
 
       {/* 横向 Retrieved Data 卡片 */}
-      <Card title="Retrieved Data" className={style.dataCard} style={{ margin: '16px 0' }}>
+      <Card
+        title="Retrieved Data"
+        className={style.dataCard}
+        style={{ margin: '16px 0' }}
+      >
         <List
           size="small"
           dataSource={retrievedData}

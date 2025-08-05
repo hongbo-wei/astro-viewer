@@ -4,7 +4,6 @@ import { createBrowserRouter, Navigate } from 'react-router-dom'
 import App from '@/App'
 import AstroImageViewer from '@/views/AstroImageViewer'
 import ErrorPage from '@/views/ErrorPage'
-import Example from '@/views/Example'
 
 const router = createBrowserRouter([
   {

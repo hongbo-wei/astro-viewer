@@ -1,7 +1,9 @@
 import React from 'react'
-import styles from './index.module.scss'
 import type * as THREE from 'three'
+
 import { pixelToRaDec } from '@/utils/raycastUtils'
+
+import styles from './index.module.scss'
 
 /**
  * SelectionBox 选区组件
@@ -27,7 +29,7 @@ interface SelectionBoxProps {
     y: number,
     containerRect: DOMRect,
     camera: THREE.PerspectiveCamera,
-    sphere: THREE.Mesh
+    sphere: THREE.Mesh,
   ) => { ra: number; dec: number } | null
   camera: THREE.PerspectiveCamera
   sphere: THREE.Mesh
@@ -36,7 +38,18 @@ interface SelectionBoxProps {
   decLimit?: number
 }
 
-const SelectionBox: React.FC<SelectionBoxProps> = ({ start, end, className, containerRect, getRaDecByRaycast, camera, sphere, onChange, raLimit, decLimit }) => {
+const SelectionBox: React.FC<SelectionBoxProps> = ({
+  start,
+  end,
+  className,
+  containerRect,
+  getRaDecByRaycast,
+  camera,
+  sphere,
+  onChange,
+  raLimit,
+  decLimit,
+}) => {
   const left = Math.min(start.x, end.x)
   const top = Math.min(start.y, end.y)
   const width = Math.abs(end.x - start.x)
@@ -47,7 +60,11 @@ const SelectionBox: React.FC<SelectionBoxProps> = ({ start, end, className, cont
   const containerRef = React.useRef<HTMLElement | null>(null)
   React.useEffect(() => {
     // 兼容原有 containerRect 传递方式，自动挂载 ref
-    if (containerRect && containerRect instanceof DOMRect && containerRef.current == null) {
+    if (
+      containerRect &&
+      containerRect instanceof DOMRect &&
+      containerRef.current == null
+    ) {
       // 尝试通过 sphere.parentElement 查找 DOM
       if ((sphere as any)?.parent?.element) {
         containerRef.current = (sphere as any).parent.element as HTMLElement
@@ -63,7 +80,7 @@ const SelectionBox: React.FC<SelectionBoxProps> = ({ start, end, className, cont
       // 兼容老逻辑
       return getRaDecByRaycast(x, y, containerRect, camera, sphere)
     },
-    [containerRef, camera, sphere, containerRect, getRaDecByRaycast]
+    [containerRef, camera, sphere, containerRect, getRaDecByRaycast],
   )
   const fallback = convert(start.x, start.y) || { ra: 0, dec: 0 }
   const minX = left
@@ -86,15 +103,15 @@ const SelectionBox: React.FC<SelectionBoxProps> = ({ start, end, className, cont
     const startCorner = convert(start.x, start.y)
     if (startCorner) {
       let centerRA = startCorner.ra
-      let centerDec = startCorner.dec
+      const centerDec = startCorner.dec
       const normRA = (ra: number) => (ra < 0 ? ra + 360 : ra)
       centerRA = normRA(centerRA)
       let raMin = centerRA - (raLimit ?? 9999)
       let raMax = centerRA + (raLimit ?? 9999)
       if (raMin < 0) raMin += 360
       if (raMax >= 360) raMax -= 360
-      let decMin = centerDec - (decLimit ?? 9999)
-      let decMax = centerDec + (decLimit ?? 9999)
+      const decMin = centerDec - (decLimit ?? 9999)
+      const decMax = centerDec + (decLimit ?? 9999)
       limitedCorners = rawCorners.map((c) => {
         let ra = normRA(c.ra)
         let dec = c.dec
@@ -104,7 +121,7 @@ const SelectionBox: React.FC<SelectionBoxProps> = ({ start, end, className, cont
         } else {
           inRaRange = ra >= raMin || ra <= raMax
         }
-        let inDecRange = dec >= decMin && dec <= decMax
+        const inDecRange = dec >= decMin && dec <= decMax
         if (!inRaRange || !inDecRange) {
           warning = true
           if (!inRaRange) {
@@ -132,10 +149,15 @@ const SelectionBox: React.FC<SelectionBoxProps> = ({ start, end, className, cont
   const prevRef = React.useRef<{ corners: any; warning: boolean }>()
   React.useEffect(() => {
     // 输出调试信息
-    console.log('[SelectionBox] 四角:', limitedCorners, '中心:', { x: centerX, y: centerY, raDec: centerRaDec })
+    // console.log('[SelectionBox] 四角:', limitedCorners, '中心:', {
+    //   x: centerX,
+    //   y: centerY,
+    //   raDec: centerRaDec,
+    // })
     if (!onChange) return
     const prev = prevRef.current
-    const cornersChanged = !prev || JSON.stringify(prev.corners) !== JSON.stringify(limitedCorners)
+    const cornersChanged =
+      !prev || JSON.stringify(prev.corners) !== JSON.stringify(limitedCorners)
     const warningChanged = !prev || prev.warning !== warning
     if (cornersChanged || warningChanged) {
       onChange(limitedCorners, warning)
@@ -145,7 +167,9 @@ const SelectionBox: React.FC<SelectionBoxProps> = ({ start, end, className, cont
 
   return (
     <div
-      className={className ? `${styles.selectionBox} ${className}` : styles.selectionBox}
+      className={
+        className ? `${styles.selectionBox} ${className}` : styles.selectionBox
+      }
       style={{
         left,
         top,
