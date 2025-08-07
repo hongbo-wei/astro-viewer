@@ -82,10 +82,10 @@ const AstroImageViewer: React.FC = () => {
   ])
 
   const [previewData, setPreviewData] = useState<string[]>([
-    'Top Left - RA: , Dec: ',
-    'Top Right - RA: , Dec: ',
-    'Bottom Left - RA: , Dec: ',
-    'Bottom Right - RA: , Dec: ',
+    'Top Left\nRA:\nDec:',
+    'Top Right\nRA:\nDec:',
+    'Bottom Left\nRA:\nDec:',
+    'Bottom Right\nRA:\nDec:',
   ])
 
   // 新增：用于测试窗口的 state
@@ -424,14 +424,14 @@ const AstroImageViewer: React.FC = () => {
                       onChange={(corners, warning) => {
                         const cornerLabels = [
                           'Top Left',
-                          'Top Right', 
+                          'Top Right',
                           'Bottom Left',
-                          'Bottom Right'
+                          'Bottom Right',
                         ]
                         setPreviewData(
                           corners.map(
                             (c, index) =>
-                              `${cornerLabels[index]} - RA: ${c.ra.toFixed(6)}°, Dec: ${c.dec.toFixed(6)}°`,
+                              `${cornerLabels[index]}\nRA: ${c.ra.toFixed(6)}°\nDec: ${c.dec.toFixed(6)}°`,
                           ),
                         )
                         setLastSelectionCorners(corners) // 存储原始高精度数据
@@ -469,14 +469,20 @@ const AstroImageViewer: React.FC = () => {
               dataSource={previewData}
               renderItem={(item, idx) => {
                 // 提取角点标识和坐标
-                const cornerMatch = item.match(/^(.*?)\s*-\s*RA[:\s]*([\d.-]+)[^\d]+Dec[:\s]*([\d.-]+)/i)
+                const cornerMatch = item.match(
+                  /^(.*?)\s*-\s*RA[:\s]*([\d.-]+)[^\d]+Dec[:\s]*([\d.-]+)/i,
+                )
                 if (cornerMatch) {
                   const cornerLabel = cornerMatch[1] ?? ''
                   const ra = cornerMatch[2] ?? ''
                   const dec = cornerMatch[3] ?? ''
+                  // 返回格式化的角点信息
                   return (
                     <div key={idx}>
-                      <div className={style.coordinationText} style={{ fontWeight: 'bold', color: '#1890ff' }}>
+                      <div
+                        className={style.coordinationText}
+                        style={{ fontWeight: 'bold', color: '#1890ff' }}
+                      >
                         {cornerLabel}
                       </div>
                       <div className={style.coordinationText}>RA: {ra}°</div>
@@ -493,7 +499,37 @@ const AstroImageViewer: React.FC = () => {
                     </div>
                   )
                 }
-                
+
+                // 处理新的多行格式
+                if (item.includes('\n')) {
+                  const lines = item.split('\n')
+                  const cornerLabel = lines[0] || ''
+                  const raLine = lines[1] || 'RA:'
+                  const decLine = lines[2] || 'Dec:'
+
+                  return (
+                    <div key={idx}>
+                      <div
+                        className={style.coordinationText}
+                        style={{ fontWeight: 'bold', color: '#1890ff' }}
+                      >
+                        {cornerLabel}
+                      </div>
+                      <div className={style.coordinationText}>{raLine}</div>
+                      <div className={style.coordinationText}>{decLine}</div>
+                      {idx !== previewData.length - 1 && (
+                        <hr
+                          style={{
+                            margin: '6px 0',
+                            border: 0,
+                            borderTop: '1px solid #eee',
+                          }}
+                        />
+                      )}
+                    </div>
+                  )
+                }
+
                 // 备用匹配逻辑（兼容老格式）
                 const match = item.match(
                   /RA[:\s]*([\d.-]+)[^\d]+Dec[:\s]*([\d.-]+)/i,
@@ -517,7 +553,7 @@ const AstroImageViewer: React.FC = () => {
                     </div>
                   )
                 }
-                
+
                 // 如果都不匹配，直接显示原始内容
                 return (
                   <div key={idx}>
