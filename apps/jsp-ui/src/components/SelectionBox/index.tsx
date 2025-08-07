@@ -90,8 +90,8 @@ const SelectionBox: React.FC<SelectionBoxProps> = ({
   const rawCorners = [
     convert(minX, minY) || fallback, // Top-left
     convert(maxX, minY) || fallback, // Top-right
-    convert(maxX, maxY) || fallback, // Bottom-right
     convert(minX, maxY) || fallback, // Bottom-left
+    convert(maxX, maxY) || fallback, // Bottom-right
   ]
   const centerX = (start.x + end.x) / 2
   const centerY = (start.y + end.y) / 2

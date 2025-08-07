@@ -82,10 +82,10 @@ const AstroImageViewer: React.FC = () => {
   ])
 
   const [previewData, setPreviewData] = useState<string[]>([
-    'RA: , Dec: ',
-    'RA: , Dec: ',
-    'RA: , Dec: ',
-    'RA: , Dec: ',
+    'Top Left - RA: , Dec: ',
+    'Top Right - RA: , Dec: ',
+    'Bottom Left - RA: , Dec: ',
+    'Bottom Right - RA: , Dec: ',
   ])
 
   // 新增：用于测试窗口的 state
@@ -422,10 +422,16 @@ const AstroImageViewer: React.FC = () => {
                       raLimit={RA_LIMIT}
                       decLimit={DEC_LIMIT}
                       onChange={(corners, warning) => {
+                        const cornerLabels = [
+                          'Top Left',
+                          'Top Right', 
+                          'Bottom Left',
+                          'Bottom Right'
+                        ]
                         setPreviewData(
                           corners.map(
-                            (c) =>
-                              `RA: ${c.ra.toFixed(6)}°, Dec: ${c.dec.toFixed(6)}°`,
+                            (c, index) =>
+                              `${cornerLabels[index]} - RA: ${c.ra.toFixed(6)}°, Dec: ${c.dec.toFixed(6)}°`,
                           ),
                         )
                         setLastSelectionCorners(corners) // 存储原始高精度数据
@@ -462,28 +468,60 @@ const AstroImageViewer: React.FC = () => {
               size="small"
               dataSource={previewData}
               renderItem={(item, idx) => {
-                let ra = '',
-                  dec = ''
+                // 提取角点标识和坐标
+                const cornerMatch = item.match(/^(.*?)\s*-\s*RA[:\s]*([\d.-]+)[^\d]+Dec[:\s]*([\d.-]+)/i)
+                if (cornerMatch) {
+                  const cornerLabel = cornerMatch[1] ?? ''
+                  const ra = cornerMatch[2] ?? ''
+                  const dec = cornerMatch[3] ?? ''
+                  return (
+                    <div key={idx}>
+                      <div className={style.coordinationText} style={{ fontWeight: 'bold', color: '#1890ff' }}>
+                        {cornerLabel}
+                      </div>
+                      <div className={style.coordinationText}>RA: {ra}°</div>
+                      <div className={style.coordinationText}>Dec: {dec}°</div>
+                      {idx !== previewData.length - 1 && (
+                        <hr
+                          style={{
+                            margin: '6px 0',
+                            border: 0,
+                            borderTop: '1px solid #eee',
+                          }}
+                        />
+                      )}
+                    </div>
+                  )
+                }
+                
+                // 备用匹配逻辑（兼容老格式）
                 const match = item.match(
                   /RA[:\s]*([\d.-]+)[^\d]+Dec[:\s]*([\d.-]+)/i,
                 )
                 if (match) {
-                  ra = match[1] ?? ''
-                  dec = match[2] ?? ''
+                  const ra = match[1] ?? ''
+                  const dec = match[2] ?? ''
+                  return (
+                    <div key={idx}>
+                      <div className={style.coordinationText}>RA: {ra}°</div>
+                      <div className={style.coordinationText}>Dec: {dec}°</div>
+                      {idx !== previewData.length - 1 && (
+                        <hr
+                          style={{
+                            margin: '6px 0',
+                            border: 0,
+                            borderTop: '1px solid #eee',
+                          }}
+                        />
+                      )}
+                    </div>
+                  )
                 }
+                
+                // 如果都不匹配，直接显示原始内容
                 return (
                   <div key={idx}>
-                    <div className={style.coordinationText}>RA: {ra}°</div>
-                    <div className={style.coordinationText}>Dec: {dec}°</div>
-                    {idx !== previewData.length - 1 && (
-                      <hr
-                        style={{
-                          margin: '6px 0',
-                          border: 0,
-                          borderTop: '1px solid #eee',
-                        }}
-                      />
-                    )}
+                    <div className={style.coordinationText}>{item}</div>
                   </div>
                 )
               }}

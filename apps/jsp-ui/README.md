@@ -62,11 +62,19 @@ pnpm run dev
 ## 系统架构图
 
 ```mermaid
-flowchart LR
-  User[用户浏览器] -->|HTTP/HTTPS| JSPUI[前端 JSP UI]
-  JSPUI -->|REST API| Backend[后端服务]
-  Backend -->|数据库访问| DB[(数据库)]
-  Backend -->|文件存储| Storage[(天文数据存储)]
+flowchart TD
+  User[用户浏览器] -->|选框坐标+望远镜配置| JSPUI[前端 JSP UI]
+  JSPUI -->|API请求| API[API接口层]
+  API -->|查询FITS路径| DB[(后端数据库)]
+  DB -->|返回FITS路径| DataService[数据获取服务]
+  DataService -->|获取FITS文件| FITSStorage[(FITS天文数据存储)]
+  FITSStorage -->|FITS文件| ProcessService[图像处理服务]
+  ProcessService -->|多源图像融合| JSP[JSP融合算法]
+  JSP -->|融合结果| ConvertService[格式转换服务]
+  ConvertService -->|FITS转PNG| PNGStorage[(PNG图像存储)]
+  PNGStorage -->|存储完成| API
+  API -->|返回图像URL/数据| JSPUI
+  JSPUI -->|显示融合图像| User
 ```
 
 > 上图展示了 Astro Visualizer 的主要架构：用户通过浏览器访问前端（JSP UI），前端通过 API 与后端服务通信，后端负责数据处理与存储。
