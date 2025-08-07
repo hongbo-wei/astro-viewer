@@ -330,6 +330,7 @@ const CelestialSphere = forwardRef<any, CelestialSphereProps>(
 
       // 异步加载银河贴图，加载完成后赋值给材质
       const loader = new THREE.TextureLoader()
+      // https://science.nasa.gov/mission/hubble/multimedia/online-activities/hubble-skymap/
       loader.load('/milkyway.jpg', (texture) => {
         sphereMaterial.map = texture
         sphereMaterial.needsUpdate = true
