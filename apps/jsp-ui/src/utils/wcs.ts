@@ -187,12 +187,15 @@ export function sphereToRaDecStandard(
 
   // 使用标准的球坐标转换
   // 其中 Y 轴指向北极，X-Z 平面是赤道面
-  const dec = Math.asin(ny)
-  const ra = Math.atan2(nz, nx)
+  let dec = Math.asin(ny)
+  let ra = Math.atan2(nz, nx)
+  ra = (ra * 180) / Math.PI
+  if (ra < 0) ra += 360 // 保证RA在0~360度之间
+  dec = (dec * 180) / Math.PI
 
   return {
-    ra: ((ra * 180) / Math.PI + 360) % 360,
-    dec: (dec * 180) / Math.PI,
+    ra,
+    dec,
   }
 }
 
