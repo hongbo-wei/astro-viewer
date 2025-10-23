@@ -1,34 +1,34 @@
-# Astro Viewer
+# AstroViewer
 
-一个基于 React, Three.js 和 TypeScript 的天文数据可视化应用。
+A multi-band astronomical data fusion (JSP) visualization application built with React, Three.js, and TypeScript.
 
-- 定义
-  - 将来自多个望远镜/波段的观测图像（通常是 FITS 格式）对齐并融合成一幅更完整、更高质量的天文图像，以突出不同数据源的互补信息（空间分辨率、波段、曝光时间等）。
-- 输入 / 输出
-  - 输入：FITS 文件（或经转换的 JSON/PNG），带天文坐标/元数据（WCS、曝光、滤镜等）。参见项目中的转换脚本 convert_fits_json.py。
-  - 输出：可用于显示的 PNG / 多层画布，或用于后续处理的融合数据。
-- 核心流程（常见步骤）
-  1. 数据摄取：从后端/API 或存储获取 FITS 路径（项目 README 中的架构说明参见 README.md）。
-  2. 校准与配准：使用 WCS 信息进行重投影（reproject）、亚像素对齐与星点匹配。
-  3. PSF/亮度归一化：匹配不同望远镜的点扩散函数与亮度尺度。
-  4. 融合算法：多尺度或基于权重的融合（你工程中提到的 JSP 融合算法在架构图中有体现，见 README.md）。
-  5. 可视化渲染：在前端用 Canvas / WebGL（Three.js）展示，支持图层、色彩映射、缩放与漫游。
-- 交互与配置
-  - 允许用户调节望远镜参数（权重、伽玛/对比、伪彩色映射）、选择要融合的波段、开/关源检测或伪彩叠加等。
-- 架构（与你仓库对应）
-  - 前端：JSP UI（React + Vite），入口文件 index.html，配置见 vite.config.ts。
-  - 后端/API（设想）：提供 FITS 路径、执行服务器端融合或格式转换（FITS -> PNG/JSON）。
-  - 存储：FITS 和融合结果的对象存储或文件系统。
+- Definitions
+  - Combine observation images from multiple telescopes/bands (usually in FITS format) by aligning and fusing them into a more complete, higher-quality astronomical image that highlights complementary information from different data sources (spatial resolution, band, exposure time, etc.).
+- Inputs / Outputs
+  - Input: FITS files (or converted JSON/PNG) with astronomical coordinates/metadata (WCS, exposure, filter, etc.). See the project’s conversion script `convert_fits_json.py`.
+  - Output: PNGs / multi-layer canvases suitable for display, or fused data for further processing.
+- Core process (common steps)
+  1. Data ingestion: obtain FITS paths from a backend/API or storage (see architecture notes in the project README).
+  2. Calibration & registration: reproject using WCS info, perform sub-pixel alignment and star matching.
+  3. PSF / brightness normalization: match point spread functions and brightness scales across telescopes.
+  4. Fusion algorithms: multi-scale or weight-based fusion (the JSP fusion algorithm mentioned in the project is shown in the architecture diagram in README).
+  5. Visualization rendering: display in the front end with Canvas / WebGL (Three.js), supporting layers, color mapping, zoom, and pan.
+- Interaction & configuration
+  - Allow users to adjust telescope parameters (weights, gamma/contrast, pseudo-color mapping), select bands to fuse, toggle source detection or pseudo-color overlays, etc.
+- Architecture (mapped to this repo)
+  - Frontend: JSP UI (React + Vite), entry is `index.html`, configuration in `vite.config.ts`.
+  - Backend/API (conceptual): provides FITS paths and performs server-side fusion or format conversion (FITS -> PNG/JSON).
+  - Storage: object storage or filesystem for FITS and fusion outputs.
 
-## 环境要求
+## Environment requirements
 
 ### Node.js
 
-推荐使用 Node.js >= 18
+Node.js >= 18 is recommended.
 
-### 包管理器
+### Package manager
 
-使用 pnpm 作为包管理器：
+This project uses pnpm as the package manager:
 
 ```bash
 npm install -g pnpm
@@ -36,79 +36,79 @@ npm install -g pnpm
 
 ### Turbo
 
-安装 Turbo 以支持 monorepo 管理：
+Install Turbo to support the monorepo:
 
 ```bash
 pnpm install turbo --global
 ```
 
-## 快速开始
+## Quick start
 
 ```bash
-# 安装依赖
+# Install dependencies
 pnpm install
 
-# 启动开发服务器
+# Start the development server
 pnpm dev
 
-# 或者单独启动 JSP-UI 应用
+# Or start the JSP-UI app only
 cd apps/jsp-ui
 pnpm dev
 ```
 
-## 项目结构
+## Project structure
 
-这是一个基于 Turborepo 的 monorepo 项目，包含以下部分：
+This is a Turborepo monorepo containing:
 
-### 应用 (Apps)
+### Apps
 
-- `jsp-ui`: 主要的天文数据可视化应用，基于 React + TypeScript + Vite
+- `jsp-ui`: The main astronomical visualization app, built with React + TypeScript + Vite
 
-### 包 (Packages)
+### Packages
 
-- `@zj-astro/ui`: 共享的 React 组件库
-- `@repo/eslint-config`: ESLint 配置
-- `@repo/typescript-config`: TypeScript 配置
-- `operators`: 操作相关的工具包
+- `@zj-astro/ui`: Shared React component library
+- `@repo/eslint-config`: ESLint configurations
+- `@repo/typescript-config`: TypeScript configurations
+- `operators`: Operator utilities
 
-## 开发工具
+## Developer tools
 
-项目已配置以下开发工具：
+The project is configured with:
 
-- [TypeScript](https://www.typescriptlang.org/) - 静态类型检查
-- [ESLint](https://eslint.org/) - 代码规范检查
-- [Prettier](https://prettier.io) - 代码格式化
+- TypeScript — static type checking
+- ESLint — linting
+- Prettier — code formatting
 
-## 开发命令
+## Dev commands
 
 ```bash
-# 开发模式 - 启动所有应用
+# Development mode — start all apps
 pnpm dev
 
-# 仅启动特定应用
+# Start a specific app only
 turbo dev --filter=jsp-ui
 
-# 构建所有应用
+# Build all apps
 pnpm build
 
-# 代码检查
+# Lint
 pnpm lint
 
-# 代码格式化
+# Format
 pnpm format
 ```
 
-## 依赖管理
+## Dependency management
 
-> ⚠️ 请使用 pnpm 管理依赖，不要使用 npm 或 yarn
+> ⚠️ Use pnpm to manage dependencies; do not use npm or yarn
 
 ```bash
-# 安装所有依赖
+# Install all dependencies
 pnpm install
 
-# 为特定应用添加依赖
+# Add a dependency to a specific app
 pnpm add <package-name> --filter jsp-ui
 
-# 为根项目添加依赖
+# Add a dependency at the root workspace
 pnpm add <package-name> -w
 ```
