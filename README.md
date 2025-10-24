@@ -1,6 +1,6 @@
 # AstroViewer
 
-A multi-band astronomical data fusion (JSP) visualization application built with React, Three.js, and TypeScript.
+A front-end multi-band astronomical data fusion and visualization application for Joint Survey Processing (JSP), built with React, Three.js, and TypeScript.
 
 - Definitions
   - Combine observation images from multiple telescopes/bands (usually in FITS format) by aligning and fusing them into a more complete, higher-quality astronomical image that highlights complementary information from different data sources (spatial resolution, band, exposure time, etc.).
@@ -19,6 +19,8 @@ A multi-band astronomical data fusion (JSP) visualization application built with
   - Frontend: JSP UI (React + Vite), entry is `index.html`, configuration in `vite.config.ts`.
   - Backend/API (conceptual): provides FITS paths and performs server-side fusion or format conversion (FITS -> PNG/JSON).
   - Storage: object storage or filesystem for FITS and fusion outputs.
+
+![AstroViewer](AstroViewer.png)
 
 ## Environment requirements
 
